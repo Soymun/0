@@ -1,12 +1,11 @@
 package com.example.demo.Entity;
 
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.beans.JavaBean;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
