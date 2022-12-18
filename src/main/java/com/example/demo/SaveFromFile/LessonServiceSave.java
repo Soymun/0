@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,14 +21,14 @@ import java.util.List;
 @Component
 public class LessonServiceSave {
 
-    public List<NativeLesson> getNativeLesson(File file) {
+    public List<NativeLesson> getNativeLesson(InputStream file) {
         try {
             OPCPackage pkg = OPCPackage.open(file);
             XSSFWorkbook book = new XSSFWorkbook(pkg);
             XSSFSheet sheet = book.getSheet("Лист1");
             Iterator<Row> ri = sheet.rowIterator();
             long idWeekend = 0L;
-            List<String> weekend = List.of("Monday", "Tuesday", "Friday", "Thursday", "Friday", "Saturday");
+            List<String> weekend = List.of("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
             List<NativeLesson> nativeLessons = new ArrayList<>();
             List<String> group = new ArrayList<>();
             int number = 0;
@@ -65,7 +66,7 @@ public class LessonServiceSave {
         return null;
     }
 
-    public List<NativeLesson> convert(List<NativeLesson> nativeLessons){
+    private List<NativeLesson> convert(List<NativeLesson> nativeLessons){
         List<NativeLesson> nativeLessonList = new ArrayList<>();
         for (NativeLesson nativeLesson : nativeLessons) {
             if (nativeLesson.getLesson().length() == 0) {
@@ -85,7 +86,7 @@ public class LessonServiceSave {
         return nativeLessonList;
     }
 
-    public void add(NativeLesson nativeLesson, List<NativeLesson> nativeLessonList, Odds odds){
+    private void add(NativeLesson nativeLesson, List<NativeLesson> nativeLessonList, Odds odds){
         String[] regex = null;
         switch (odds){
             case NONE -> regex = nativeLesson.getLesson().split("_");

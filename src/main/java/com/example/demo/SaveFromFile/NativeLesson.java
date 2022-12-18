@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class NativeLesson {
 
     private String group;
-    private  String lesson;
+    private String lesson;
     private Long number;
 
     private Long weak;
@@ -20,7 +20,6 @@ public class NativeLesson {
     private String classroom;
 
     private String type;
-
     private String day;
 
     public NativeLesson(String group, String lesson, Long number, String day) {

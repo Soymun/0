@@ -28,8 +28,4 @@ public class Lesson {
     private String teacherName;
 
     private String classRoom;
-
-    @ManyToMany
-    @JoinTable(name = "lessonGroup", joinColumns = @JoinColumn(name = "groupId", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "lessonId", referencedColumnName = "id"))
-    private List<Group> group;
 }

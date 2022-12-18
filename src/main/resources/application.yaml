@@ -6,3 +6,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+
+jwt:
+  security:
+    secret: soymun
+    validate : 3600000
