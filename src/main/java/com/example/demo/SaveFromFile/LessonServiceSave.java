@@ -11,12 +11,9 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class LessonServiceSave {
@@ -28,8 +25,8 @@ public class LessonServiceSave {
             XSSFSheet sheet = book.getSheet("Лист1");
             Iterator<Row> ri = sheet.rowIterator();
             long idWeekend = 0L;
-            List<String> weekend = List.of("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
-            List<NativeLesson> nativeLessons = new ArrayList<>();
+            List<String> weekend = List.of("Monday", "Tuesday", "Friday", "Thursday", "Friday", "Saturday");
+            List<NativeLesson> lessons2 = new ArrayList<>();
             List<String> group = new ArrayList<>();
             int number = 0;
             while(ri.hasNext()) {
@@ -46,9 +43,9 @@ public class LessonServiceSave {
                         else {
                             if (cell.getStringCellValue().equals("end")) {
                                 idWeekend++;
-                            } else if (!cell.getStringCellValue().equals("")) {
-                                NativeLesson nativeLesson = new NativeLesson(group.get(cell.getColumnIndex() - 3), cell.getStringCellValue(), (long) number, weekend.get((int) idWeekend));
-                                nativeLessons.add(nativeLesson);
+                            } else {
+                                NativeLesson lesson = new NativeLesson(group.get(cell.getColumnIndex() - 3), cell.getStringCellValue().trim(), (long) number, weekend.get((int) idWeekend));
+                                lessons2.add(lesson);
                             }
                         }
                     } else if (cell.getCellType() == CellType.NUMERIC) {
@@ -59,7 +56,7 @@ public class LessonServiceSave {
                 }
             }
             pkg.close();
-            return convert(nativeLessons);
+            return convert(lessons2).stream().distinct().toList();
         } catch (InvalidFormatException | IOException e) {
             e.printStackTrace();
         }
@@ -67,30 +64,35 @@ public class LessonServiceSave {
     }
 
     private List<NativeLesson> convert(List<NativeLesson> nativeLessons){
-        List<NativeLesson> nativeLessonList = new ArrayList<>();
-        for (NativeLesson nativeLesson : nativeLessons) {
-            if (nativeLesson.getLesson().length() == 0) {
+        Map<KeyMap, ListLesson> keyMapListLessonMap = new HashMap<>();
+        List<NativeLesson> lessonList = new ArrayList<>();
+        for (NativeLesson lesson : nativeLessons) {
+            if (lesson.getLesson().length() == 0) {
                 for (int j = 1; j <= 18; j++) {
-                    NativeLesson nativeLesson1 = new NativeLesson(nativeLesson);
-                    nativeLesson1.setWeak((long) j);
-                    nativeLessonList.add(nativeLesson1);
+                    NativeLesson lesson1 = new NativeLesson(lesson);
+                    lesson1.setWeak((long) j);
+                    addLesson(keyMapListLessonMap, lesson1);
                 }
-            } else if (nativeLesson.getLesson().startsWith("ч/н")) {
-                add(nativeLesson, nativeLessonList, Odds.EVEN);
-            } else if (nativeLesson.getLesson().startsWith("н/н")) {
-                add(nativeLesson, nativeLessonList, Odds.ODD);
+            } else if (lesson.getLesson().startsWith("ч/н")) {
+                add(keyMapListLessonMap, lesson, lessonList, Odds.EVEN);
+            } else if (lesson.getLesson().startsWith("н/н")) {
+                add(keyMapListLessonMap, lesson, lessonList, Odds.ODD);
             } else {
-                add(nativeLesson, nativeLessonList, Odds.NONE);
+                add(keyMapListLessonMap, lesson, lessonList, Odds.NONE);
             }
         }
-        return nativeLessonList;
+        ArrayList<NativeLesson> lessonList1 = new ArrayList<>();
+        keyMapListLessonMap.entrySet().stream().forEach(n -> {
+            lessonList1.addAll(n.getValue().lessons);
+        });
+        return lessonList1;
     }
 
-    private void add(NativeLesson nativeLesson, List<NativeLesson> nativeLessonList, Odds odds){
+    private void add(Map<KeyMap, ListLesson> keyMapListLessonMap, NativeLesson nativeLesson, List<NativeLesson> nativeLessonList, Odds odds){
         String[] regex = null;
         switch (odds){
-            case NONE -> regex = nativeLesson.getLesson().split("_");
-            case ODD,EVEN -> regex = nativeLesson.getLesson().substring(4).split("_");
+            case NONE -> regex = regex(nativeLesson.getLesson());
+            case ODD,EVEN -> regex = regex(nativeLesson.getLesson().substring(4));
         }
         String[] weeks = regex[0].split(",");
         for (String week : weeks) {
@@ -98,14 +100,14 @@ public class LessonServiceSave {
                 if(week.endsWith("н")){
                     week = week.replace("н", "");
                 }
-                NativeLesson nativeLesson1 = new NativeLesson(nativeLesson);
-                nativeLesson1.setWeak(Long.parseLong(week));
-                nativeLesson1.setLesson(regex[1]);
-                nativeLesson1.setType(regex[2]);
-                nativeLesson1.setClassroom(regex[3]);
-                nativeLesson1.setTeacher(regex[4]);
-                nativeLessonList.add(nativeLesson1);
-            } else if (week.length() == 3 || week.length() == 4){
+                NativeLesson lesson1 = new NativeLesson(nativeLesson);
+                lesson1.setWeak(Long.parseLong(week));
+                lesson1.setLesson(regex[1].trim());
+                lesson1.setType(regex[2].trim());
+                lesson1.setClassroom(regex[3].trim());
+                lesson1.setTeacher(regex[4].trim());
+                addLesson(keyMapListLessonMap, lesson1);
+            } else if (week.length() == 3 || week.length() == 4 || week.length() == 5){
                 String[] fromTo = week.split("-");
                 if(fromTo[1].endsWith("н")){
                     fromTo[1] = fromTo[1].replace("н", "");
@@ -114,36 +116,98 @@ public class LessonServiceSave {
                     switch (odds){
                         case ODD -> {
                             if(l%2 == 1){
-                                NativeLesson nativeLesson1 = new NativeLesson(nativeLesson);
-                                nativeLesson1.setWeak((long) l);
-                                nativeLesson1.setLesson(regex[1]);
-                                nativeLesson1.setType(regex[2]);
-                                nativeLesson1.setClassroom(regex[3]);
-                                nativeLesson1.setTeacher(regex[4]);
-                                nativeLessonList.add(nativeLesson1);}
+                                NativeLesson lesson1 = new NativeLesson(nativeLesson);
+                                lesson1.setWeak((long) l);
+                                lesson1.setLesson(regex[1].trim());
+                                lesson1.setType(regex[2].trim());
+                                lesson1.setClassroom(regex[3].trim());
+                                lesson1.setTeacher(regex[4].trim());
+                                addLesson(keyMapListLessonMap, lesson1);
+                            }
                         }
                         case EVEN -> {
                             if(l%2 == 0){
-                                NativeLesson nativeLesson1 = new NativeLesson(nativeLesson);
-                                nativeLesson1.setWeak((long) l);
-                                nativeLesson1.setLesson(regex[1]);
-                                nativeLesson1.setType(regex[2]);
-                                nativeLesson1.setClassroom(regex[3]);
-                                nativeLesson1.setTeacher(regex[4]);
-                                nativeLessonList.add(nativeLesson1);}
+                                NativeLesson lesson1 = new NativeLesson(nativeLesson);
+                                lesson1.setWeak((long) l);
+                                lesson1.setLesson(regex[1].trim());
+                                lesson1.setType(regex[2].trim());
+                                lesson1.setClassroom(regex[3].trim());
+                                lesson1.setTeacher(regex[4].trim());
+                                addLesson(keyMapListLessonMap, lesson1);
+                            }
                         }
                         case NONE -> {
-                            NativeLesson nativeLesson1 = new NativeLesson(nativeLesson);
-                            nativeLesson1.setWeak((long) l);
-                            nativeLesson1.setLesson(regex[1]);
-                            nativeLesson1.setType(regex[2]);
-                            nativeLesson1.setClassroom(regex[3]);
-                            nativeLesson1.setTeacher(regex[4]);
-                            nativeLessonList.add(nativeLesson1);
+                            NativeLesson lesson1 = new NativeLesson(nativeLesson);
+                            lesson1.setWeak((long) l);
+                            lesson1.setLesson(regex[1].trim());
+                            lesson1.setType(regex[2].trim());
+                            lesson1.setClassroom(regex[3].trim());
+                            lesson1.setTeacher(regex[4].trim());
+                            addLesson(keyMapListLessonMap, lesson1);
                         }
                     }
                 }
             }
+        }
+    }
+    public String[] regex(String str){
+        List<String> list = new ArrayList<>();
+        String[] strings = str.split(" ");
+        list.add(strings[0]);
+        String lesson = "";
+        int i = 1;
+        for (;i< strings.length;i++) {
+            if(!strings[i].equals("пр.з") && !strings[i].equals("лаб.") && !strings[i].equals("лек.")){
+                lesson += " " + strings[i];
+            }
+            else {
+                break;
+            }
+        }
+        list.add(lesson.trim());
+        String typeOfLesson = "";
+        for (;i< strings.length;i++){
+            if(!strings[i].startsWith("А") && !strings[i].startsWith("Б") && !strings[i].startsWith("В") && !strings[i].startsWith("Г") && !strings[i].startsWith("Д")){
+                typeOfLesson += " " + strings[i];
+            }
+            else {
+                break;
+            }
+        }
+        list.add(typeOfLesson.trim());
+        list.add(strings[i]);
+        i++;
+        String teacher = "";
+        for(;i < strings.length;i++){
+            teacher += " " + strings[i];
+        }
+        list.add(teacher.trim());
+        return list.toArray(String[]::new);
+    }
+
+    public static void addLesson(Map<KeyMap, ListLesson> keyMapListLessonMap, NativeLesson lesson1){
+        KeyMap keyMap = new KeyMap(lesson1.getNumber(), lesson1.getGroup(), lesson1.getDay(), lesson1.getWeak());
+        if(keyMapListLessonMap.containsKey(keyMap)){
+            ListLesson listLesson = keyMapListLessonMap.get(keyMap);
+            List<Integer> list = new ArrayList<>();
+            if(listLesson.lessons.size() != 0 && !lesson1.getLesson().equals("")){
+                for(int i = 0; i < listLesson.lessons.size();i++){
+                    if(listLesson.lessons.get(i).getLesson().equals("")){
+                        list.add(i);
+                    }
+                }
+                for(Integer integer: list){
+                    listLesson.lessons.remove(integer.intValue());
+                }
+                listLesson.lessons.add(lesson1);
+                keyMapListLessonMap.remove(keyMap);
+                keyMapListLessonMap.put(keyMap, listLesson);
+            }
+        }
+        else {
+            ListLesson listLesson = new ListLesson();
+            listLesson.lessons.add(lesson1);
+            keyMapListLessonMap.put(keyMap, listLesson);
         }
     }
 }

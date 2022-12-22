@@ -23,4 +23,7 @@ public interface LessonService {
     void deleteLesson(Long id);
 
     void deleteLesson(List<Long> ids);
+
+    void saveLessonGroup(LessonGroup lessonGroup);
+
 }

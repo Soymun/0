@@ -21,7 +21,7 @@ public class Week {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime from;
+    private LocalDateTime fromWeek;
 
-    private LocalDateTime to;
+    private LocalDateTime toWeek;
 }

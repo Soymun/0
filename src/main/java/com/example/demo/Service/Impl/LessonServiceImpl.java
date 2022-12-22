@@ -3,6 +3,7 @@ package com.example.demo.Service.Impl;
 import com.example.demo.DTO.LessonDto;
 import com.example.demo.Entity.*;
 import com.example.demo.Mappers.LessonMapper;
+import com.example.demo.Repositories.LessonGroupRepository;
 import com.example.demo.Repositories.LessonRepository;
 import com.example.demo.Repositories.WeekRepository;
 import com.example.demo.SaveFromFile.LessonServiceSave;
@@ -31,6 +32,8 @@ public class LessonServiceImpl implements LessonService {
 
     private final WeekRepository weekRepository;
 
+    private final LessonGroupRepository lessonGroupRepository;
+
     private final LessonMapper lessonMapper;
 
     private final LessonServiceSave lessonServiceSave;
@@ -39,9 +42,10 @@ public class LessonServiceImpl implements LessonService {
     EntityManager entityManager;
 
     @Autowired
-    public LessonServiceImpl(LessonRepository lessonRepository, WeekRepository weekRepository, LessonMapper lessonMapper, LessonServiceSave lessonServiceSave) {
+    public LessonServiceImpl(LessonRepository lessonRepository, WeekRepository weekRepository, LessonGroupRepository lessonGroupRepository, LessonMapper lessonMapper, LessonServiceSave lessonServiceSave) {
         this.lessonRepository = lessonRepository;
         this.weekRepository = weekRepository;
+        this.lessonGroupRepository = lessonGroupRepository;
         this.lessonMapper = lessonMapper;
         this.lessonServiceSave = lessonServiceSave;
     }
@@ -63,7 +67,6 @@ public class LessonServiceImpl implements LessonService {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
-
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
         cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId), cb.between(join.get(Lesson_.DAY), day, day2)));
 
@@ -81,7 +84,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public Map<LessonGroup, String> saveLessonFromFile(MultipartFile file) throws IOException {
-        List<NativeLesson> nativeLessons = lessonServiceSave.getNativeLesson(file.getInputStream());
+        List<NativeLesson> nativeLessons = lessonServiceSave.getNativeLesson(file.getInputStream()).stream().distinct().toList();
         Map<LessonGroup, String> lessonGroupStringMap = new HashMap<>();
         for (NativeLesson nativeLesson: nativeLessons){
             Week week = weekRepository.findWeekById(nativeLesson.getWeak());
@@ -92,12 +95,12 @@ public class LessonServiceImpl implements LessonService {
                 lesson.setTeacherName(nativeLesson.getTeacher());
                 lesson.setClassRoom(nativeLesson.getClassroom());
                 switch (nativeLesson.getDay()){
-                    case "Monday" -> lesson.setDay(week.getFrom());
-                    case "Tuesday" -> lesson.setDay(week.getFrom().plusDays(1));
-                    case "Wednesday" -> lesson.setDay(week.getFrom().plusDays(2));
-                    case "Thursday" -> lesson.setDay(week.getFrom().plusDays(3));
-                    case "Friday" -> lesson.setDay(week.getFrom().plusDays(4));
-                    case "Saturday" -> lesson.setDay(week.getFrom().plusDays(5));
+                    case "Monday" -> lesson.setDay(week.getFromWeek());
+                    case "Tuesday" -> lesson.setDay(week.getFromWeek().plusDays(1));
+                    case "Wednesday" -> lesson.setDay(week.getFromWeek().plusDays(2));
+                    case "Thursday" -> lesson.setDay(week.getFromWeek().plusDays(3));
+                    case "Friday" -> lesson.setDay(week.getFromWeek().plusDays(4));
+                    case "Saturday" -> lesson.setDay(week.getFromWeek().plusDays(5));
                 }
                 Lesson savedLesson = lessonRepository.save(lesson);
                 LessonGroup lessonGroup = new LessonGroup();
@@ -116,5 +119,10 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public void deleteLesson(List<Long> ids) {
         ids.forEach(lessonRepository::deleteById);
+    }
+
+    @Override
+    public void saveLessonGroup(LessonGroup lessonGroup) {
+        lessonGroupRepository.save(lessonGroup);
     }
 }

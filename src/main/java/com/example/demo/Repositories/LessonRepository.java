@@ -14,6 +14,5 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     List<Lesson> getAllByNumber(Long number);
 
     Lesson getLessonById(Long id);
-
-    List<Lesson> getAllByGroupInAndDayBetween(List<Group> group, LocalDateTime day, LocalDateTime day2);
+    
 }
