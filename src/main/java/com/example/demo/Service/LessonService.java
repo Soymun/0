@@ -1,6 +1,7 @@
 package com.example.demo.Service;
 
 import com.example.demo.DTO.LessonDto;
+import com.example.demo.DTO.TeacherLessonDto;
 import com.example.demo.Entity.Group;
 import com.example.demo.Entity.LessonGroup;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,9 +17,13 @@ public interface LessonService {
 
     LessonDto updateLesson(LessonDto lessonDto);
 
+    List<TeacherLessonDto> getLessonForTeacher(String teacher, LocalDateTime day, LocalDateTime day2);
+
     List<LessonDto> getLesson(Long groupId, LocalDateTime day, LocalDateTime day2);
 
     Map<LessonGroup, String>  saveLessonFromFile(MultipartFile file) throws IOException;
+
+//    List<LessonDto> getUpdateLesson(Long groupId);
 
     void deleteLesson(Long id);
 

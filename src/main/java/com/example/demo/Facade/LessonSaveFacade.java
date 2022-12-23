@@ -84,4 +84,48 @@ public class LessonSaveFacade {
         }
         return ResponseEntity.ok(map2);
     }
+
+    public ResponseEntity<?> getLessonForTeacher(GetLessonTeacher getLessonDto){
+        List<TeacherLessonDto> lessonDtos = lessonService.getLessonForTeacher(getLessonDto.getTeacherName(), getLessonDto.getDay(), getLessonDto.getDay2());
+        Map<LocalDateTime, ListTeacherLessonDto> map = new LinkedHashMap<>();
+        lessonDtos.forEach(n -> {
+                    if(map.containsKey(n.getDay())){
+                        ListTeacherLessonDto lessonDto = map.get(n.getDay());
+                        lessonDto.getTeacherLessonDtos().add(new OutputTeacherLessonDto(n));
+                        map.put(n.getDay(),lessonDto);
+                    }
+                    else {
+                        ListTeacherLessonDto lessonDto = new ListTeacherLessonDto();
+                        lessonDto.getTeacherLessonDtos().add(new OutputTeacherLessonDto(n));
+                        map.put(n.getDay(), lessonDto);
+                    }
+                }
+        );
+        Map<LocalDateTime, ListTeacherLessonDto> map2 = new LinkedHashMap<>();
+        for (Map.Entry<LocalDateTime, ListTeacherLessonDto> entry: map.entrySet()){
+            List<OutputTeacherLessonDto> list = entry.getValue().getTeacherLessonDtos();
+            for (int i = 0;i < list.size()-1; i++){
+                OutputTeacherLessonDto outputLessonDto = list.get(i);
+                OutputTeacherLessonDto outputLessonDto1 = list.get(i+1);
+                if(outputLessonDto.getLesson().equals(outputLessonDto1.getLesson())
+                        && outputLessonDto.getClassRoom().equals(outputLessonDto1.getClassRoom())
+                        && outputLessonDto.getTeacherName().equals(outputLessonDto1.getTeacherName().replace("-- продолжение --", ""))
+                        && outputLessonDto.getToTime().isBefore(outputLessonDto1.getFromTime())
+                        && outputLessonDto.getGroup().containsAll(outputLessonDto1.getGroup())){
+                    outputLessonDto.setToTime(outputLessonDto1.getToTime());
+                    outputLessonDto.getNumber().addAll(outputLessonDto1.getNumber());
+                    outputLessonDto.getGroup().addAll(outputLessonDto1.getGroup());
+                    list.remove(i+1);
+                    i--;
+                }
+            }
+            List<OutputTeacherLessonDto> outputLessonDtos = list.stream().sorted(Comparator.comparingInt(o -> o.getNumber().get(0).intValue())).toList();
+            map2.put(entry.getKey(), new ListTeacherLessonDto(outputLessonDtos));
+        }
+        return ResponseEntity.ok(map2);
+    }
+
+//    public ResponseEntity<?> getLessonForUpdate(UpdateLessonDto updateLessonDto){
+//        List<LessonDto> lessonDtos = lessonService.getUpdateLesson(updateLessonDto.getGroupId());+
+//    }
 }

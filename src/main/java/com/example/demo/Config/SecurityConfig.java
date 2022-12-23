@@ -33,8 +33,8 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .antMatchers("/timetable/login").permitAll()
-                .antMatchers("/timetable/registration").permitAll()
+                .antMatchers("/ytsu/login").permitAll()
+                .antMatchers("/ytsu/registration").permitAll()
                 .anyRequest().authenticated()
                 .and().apply(new JwtTokenConfigure(jwtTokenProvider));
         return httpSecurity.build();

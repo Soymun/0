@@ -33,21 +33,24 @@ public class LessonServiceSave {
                 XSSFRow row = (XSSFRow) ri.next();
 
                 Iterator<Cell> ci = row.cellIterator();
-
+                int countFirst = 0;
+                int countNext = 0;
                 while(ci.hasNext()) {
                     XSSFCell cell = (XSSFCell) ci.next();
                     if(cell.getCellType() == CellType.STRING){
-                        if(row.getRowNum() == 0){
+                        if(row.getRowNum() == 0 && countFirst > 3){
                             group.add(cell.getStringCellValue());
                         }
                         else {
                             if (weekend.contains(cell.getStringCellValue().trim())) {
                                 week = cell.getStringCellValue().trim();
-                            } else if(!cell.getStringCellValue().trim().equals("")) {
+                            } else if(!cell.getStringCellValue().trim().equals("") && countNext != 3) {
                                 NativeLesson lesson = new NativeLesson(group.get(cell.getColumnIndex() - 3), cell.getStringCellValue().trim(), (long) number, week);
                                 lessons2.add(lesson);
                             }
+                            countNext++;
                         }
+                        countFirst++;
                     } else if (cell.getCellType() == CellType.NUMERIC) {
                         if(cell.getNumericCellValue() < 10){
                             number = (int) cell.getNumericCellValue();

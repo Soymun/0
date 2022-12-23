@@ -1,7 +1,9 @@
 package com.example.demo.Service.Impl;
 
 import com.example.demo.DTO.LessonDto;
+import com.example.demo.DTO.TeacherLessonDto;
 import com.example.demo.Entity.*;
+import com.example.demo.Entity.Group_;
 import com.example.demo.Entity.LessonGroup_;
 import com.example.demo.Entity.Lesson_;
 import com.example.demo.Mappers.LessonMapper;
@@ -62,6 +64,29 @@ public class LessonServiceImpl implements LessonService {
     public LessonDto updateLesson(LessonDto lessonDto) {
         Lesson lesson = lessonMapper.lessonDtoToLesson(lessonDto);
         return lessonMapper.lessonToLessonDto(lessonRepository.save(lesson));
+    }
+
+    @Override
+    public List<TeacherLessonDto> getLessonForTeacher(String teacher, LocalDateTime day, LocalDateTime day2) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<TeacherLessonDto> cq = cb.createQuery(TeacherLessonDto.class);
+        Root<LessonGroup> root = cq.from(LessonGroup.class);
+        Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
+        Join<LessonGroup, Group> join1 = root.join(LessonGroup_.GROUP);
+        cq.where(cb.and(cb.equal(join.get(Lesson_.TEACHER_NAME), teacher), cb.between(join.get(Lesson_.DAY), day, day2)));
+        cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
+        cq.multiselect(
+                join.get(Lesson_.ID),
+                join.get(Lesson_.LESSON),
+                join.get(Lesson_.DAY),
+                join.get(Lesson_.FROM_TIME),
+                join.get(Lesson_.TO_TIME),
+                join.get(Lesson_.NUMBER),
+                join.get(Lesson_.TEACHER_NAME),
+                join.get(Lesson_.CLASS_ROOM),
+                join1.get(Group_.NAME)
+        );
+        return entityManager.createQuery(cq).getResultList();
     }
 
     @Override
@@ -144,6 +169,28 @@ public class LessonServiceImpl implements LessonService {
         }
         return lessonGroupStringMap;
     }
+
+//    @Override
+//    public List<LessonDto> getUpdateLesson(Long groupId) {
+//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
+//        Root<LessonGroup> root = cq.from(LessonGroup.class);
+//        Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
+//        cq.where(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId));
+//        cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
+//        cq.multiselect(
+//                join.get(Lesson_.ID),
+//                join.get(Lesson_.LESSON),
+//                join.get(Lesson_.DAY),
+//                join.get(Lesson_.FROM_TIME),
+//                join.get(Lesson_.TO_TIME),
+//                join.get(Lesson_.NUMBER),
+//                join.get(Lesson_.TEACHER_NAME),
+//                join.get(Lesson_.CLASS_ROOM)
+//        );
+//
+//        return entityManager.createQuery(cq).getResultList();
+//    }
 
     @Override
     public void deleteLesson(Long id) {
