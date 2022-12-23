@@ -20,6 +20,10 @@ public class LessonDto {
 
     private LocalDateTime day;
 
+    private LocalDateTime fromTime;
+
+    private LocalDateTime toTime;
+
     private Long number;
 
     private String teacherName;
@@ -28,10 +32,12 @@ public class LessonDto {
 
     private List<Long> group;
 
-    public LessonDto(Long id, String lesson, LocalDateTime day, Long number, String teacherName, String classRoom) {
+    public LessonDto(Long id, String lesson, LocalDateTime day, LocalDateTime fromTime, LocalDateTime toTime, Long number, String teacherName, String classRoom) {
         this.id = id;
         this.lesson = lesson;
         this.day = day;
+        this.fromTime = fromTime;
+        this.toTime = toTime;
         this.number = number;
         this.teacherName = teacherName;
         this.classRoom = classRoom;

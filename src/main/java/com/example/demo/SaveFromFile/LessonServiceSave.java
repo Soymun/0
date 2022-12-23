@@ -22,10 +22,10 @@ public class LessonServiceSave {
         try {
             OPCPackage pkg = OPCPackage.open(file);
             XSSFWorkbook book = new XSSFWorkbook(pkg);
-            XSSFSheet sheet = book.getSheet("Лист1");
+            XSSFSheet sheet = book.getSheet("Sheet1");
             Iterator<Row> ri = sheet.rowIterator();
-            long idWeekend = 0L;
-            List<String> weekend = List.of("Monday", "Tuesday", "Friday", "Thursday", "Friday", "Saturday");
+            List<String> weekend = List.of("ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА");
+            String week = "";
             List<NativeLesson> lessons2 = new ArrayList<>();
             List<String> group = new ArrayList<>();
             int number = 0;
@@ -41,10 +41,10 @@ public class LessonServiceSave {
                             group.add(cell.getStringCellValue());
                         }
                         else {
-                            if (cell.getStringCellValue().equals("end")) {
-                                idWeekend++;
-                            } else {
-                                NativeLesson lesson = new NativeLesson(group.get(cell.getColumnIndex() - 3), cell.getStringCellValue().trim(), (long) number, weekend.get((int) idWeekend));
+                            if (weekend.contains(cell.getStringCellValue().trim())) {
+                                week = cell.getStringCellValue().trim();
+                            } else if(!cell.getStringCellValue().trim().equals("")) {
+                                NativeLesson lesson = new NativeLesson(group.get(cell.getColumnIndex() - 3), cell.getStringCellValue().trim(), (long) number, week);
                                 lessons2.add(lesson);
                             }
                         }
@@ -105,7 +105,7 @@ public class LessonServiceSave {
                 lesson1.setLesson(regex[1].trim());
                 lesson1.setType(regex[2].trim());
                 lesson1.setClassroom(regex[3].trim());
-                lesson1.setTeacher(regex[4].trim());
+                lesson1.setTeacher(regex[4].trim().replace("-- продолжение --", ""));
                 addLesson(keyMapListLessonMap, lesson1);
             } else if (week.length() == 3 || week.length() == 4 || week.length() == 5){
                 String[] fromTo = week.split("-");
@@ -121,7 +121,7 @@ public class LessonServiceSave {
                                 lesson1.setLesson(regex[1].trim());
                                 lesson1.setType(regex[2].trim());
                                 lesson1.setClassroom(regex[3].trim());
-                                lesson1.setTeacher(regex[4].trim());
+                                lesson1.setTeacher(regex[4].trim().replace("-- продолжение --", ""));
                                 addLesson(keyMapListLessonMap, lesson1);
                             }
                         }
@@ -132,7 +132,7 @@ public class LessonServiceSave {
                                 lesson1.setLesson(regex[1].trim());
                                 lesson1.setType(regex[2].trim());
                                 lesson1.setClassroom(regex[3].trim());
-                                lesson1.setTeacher(regex[4].trim());
+                                lesson1.setTeacher(regex[4].trim().replace("-- продолжение --", ""));
                                 addLesson(keyMapListLessonMap, lesson1);
                             }
                         }
@@ -142,7 +142,7 @@ public class LessonServiceSave {
                             lesson1.setLesson(regex[1].trim());
                             lesson1.setType(regex[2].trim());
                             lesson1.setClassroom(regex[3].trim());
-                            lesson1.setTeacher(regex[4].trim());
+                            lesson1.setTeacher(regex[4].trim().replace("-- продолжение --", ""));
                             addLesson(keyMapListLessonMap, lesson1);
                         }
                     }

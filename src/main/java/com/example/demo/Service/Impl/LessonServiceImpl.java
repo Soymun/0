@@ -2,6 +2,8 @@ package com.example.demo.Service.Impl;
 
 import com.example.demo.DTO.LessonDto;
 import com.example.demo.Entity.*;
+import com.example.demo.Entity.LessonGroup_;
+import com.example.demo.Entity.Lesson_;
 import com.example.demo.Mappers.LessonMapper;
 import com.example.demo.Repositories.LessonGroupRepository;
 import com.example.demo.Repositories.LessonRepository;
@@ -69,11 +71,13 @@ public class LessonServiceImpl implements LessonService {
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
         cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId), cb.between(join.get(Lesson_.DAY), day, day2)));
-
+        cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
         cq.multiselect(
                 join.get(Lesson_.ID),
                 join.get(Lesson_.LESSON),
                 join.get(Lesson_.DAY),
+                join.get(Lesson_.FROM_TIME),
+                join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
                 join.get(Lesson_.TEACHER_NAME),
                 join.get(Lesson_.CLASS_ROOM)
@@ -95,12 +99,42 @@ public class LessonServiceImpl implements LessonService {
                 lesson.setTeacherName(nativeLesson.getTeacher());
                 lesson.setClassRoom(nativeLesson.getClassroom());
                 switch (nativeLesson.getDay()){
-                    case "Monday" -> lesson.setDay(week.getFromWeek());
-                    case "Tuesday" -> lesson.setDay(week.getFromWeek().plusDays(1));
-                    case "Wednesday" -> lesson.setDay(week.getFromWeek().plusDays(2));
-                    case "Thursday" -> lesson.setDay(week.getFromWeek().plusDays(3));
-                    case "Friday" -> lesson.setDay(week.getFromWeek().plusDays(4));
-                    case "Saturday" -> lesson.setDay(week.getFromWeek().plusDays(5));
+                    case "ПОНЕДЕЛЬНИК" -> lesson.setDay(week.getFromWeek());
+                    case "ВТОРНИК" -> lesson.setDay(week.getFromWeek().plusDays(1));
+                    case "СРЕДА" -> lesson.setDay(week.getFromWeek().plusDays(2));
+                    case "ЧЕТВЕРГ" -> lesson.setDay(week.getFromWeek().plusDays(3));
+                    case "ПЯТНИЦА" -> lesson.setDay(week.getFromWeek().plusDays(4));
+                    case "СУББОТА" -> lesson.setDay(week.getFromWeek().plusDays(5));
+                }
+                switch (lesson.getNumber().intValue()){
+                    case 1 -> {
+                        lesson.setFromTime(lesson.getDay().plusHours(8).plusMinutes(30));
+                        lesson.setToTime(lesson.getDay().plusHours(10).plusMinutes(0));
+                    }
+                    case 2 -> {
+                        lesson.setFromTime(lesson.getDay().plusHours(10).plusMinutes(10));
+                        lesson.setToTime(lesson.getDay().plusHours(11).plusMinutes(40));
+                    }
+                    case 3 -> {
+                        lesson.setFromTime(lesson.getDay().plusHours(11).plusMinutes(50));
+                        lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(20));
+                    }
+                    case 4 -> {
+                        lesson.setFromTime(lesson.getDay().plusHours(12).plusMinutes(20));
+                        lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(50));
+                    }
+                    case 5 -> {
+                        lesson.setFromTime(lesson.getDay().plusHours(14).plusMinutes(0));
+                        lesson.setToTime(lesson.getDay().plusHours(15).plusMinutes(30));
+                    }
+                    case 6 -> {
+                        lesson.setFromTime(lesson.getDay().plusHours(15).plusMinutes(40));
+                        lesson.setToTime(lesson.getDay().plusHours(17).plusMinutes(10));
+                    }
+                    case 7 -> {
+                        lesson.setFromTime(lesson.getDay().plusHours(17).plusMinutes(30));
+                        lesson.setToTime(lesson.getDay().plusHours(19).plusMinutes(0));
+                    }
                 }
                 Lesson savedLesson = lessonRepository.save(lesson);
                 LessonGroup lessonGroup = new LessonGroup();

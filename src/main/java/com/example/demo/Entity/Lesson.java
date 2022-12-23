@@ -23,6 +23,10 @@ public class Lesson {
 
     private LocalDateTime day;
 
+    private LocalDateTime fromTime;
+
+    private LocalDateTime toTime;
+
     private Long number;
 
     private String teacherName;
