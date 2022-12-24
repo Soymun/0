@@ -4,8 +4,8 @@ package com.example.demo.Controller;
 import com.example.demo.DTO.GetLessonDto;
 import com.example.demo.DTO.GetLessonTeacher;
 import com.example.demo.DTO.LessonDto;
-import com.example.demo.Entity.Lesson;
-import com.example.demo.Facade.LessonSaveFacade;
+import com.example.demo.DTO.UpdateLessonDto;
+import com.example.demo.Facade.LessonFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,16 +17,17 @@ import java.util.Objects;
 @RequestMapping("/ytsu")
 public class LessonController {
 
-    private final LessonSaveFacade lessonSaveFacade;
+    private final LessonFacade lessonSaveFacade;
 
-    public LessonController(LessonSaveFacade lessonSaveFacade) {
+    public LessonController(LessonFacade lessonSaveFacade) {
         this.lessonSaveFacade = lessonSaveFacade;
     }
 
     @PostMapping("/lesson/file")
     public ResponseEntity<?> saveFromFile(@RequestParam MultipartFile multipartFile) throws IOException {
+        System.out.println(Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1]);
         if(!Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xlsx")
-                || !Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xls")){
+                && !Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xls")){
             throw new RuntimeException("Не тот тип файла");
         }
         return lessonSaveFacade.saveFromFile(multipartFile);
@@ -55,4 +56,14 @@ public class LessonController {
         }
         return lessonSaveFacade.saveLesson(lessonDto);
     }
+
+    @GetMapping("/lessons/update")
+    public ResponseEntity<?> getUpdateLesson(@RequestBody UpdateLessonDto updateLessonDto){
+        if(updateLessonDto == null || updateLessonDto.getLocalDateTime() == null){
+            throw new RuntimeException("Невозможно найти пары");
+        }
+        return lessonSaveFacade.getLessonForUpdate(updateLessonDto);
+    }
+
+
 }

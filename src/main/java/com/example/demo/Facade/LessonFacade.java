@@ -3,8 +3,11 @@ package com.example.demo.Facade;
 
 import com.example.demo.DTO.*;
 import com.example.demo.Entity.LessonGroup;
+import com.example.demo.Repositories.WeekRepository;
+import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.GroupServiceImpl;
 import com.example.demo.Service.Impl.LessonServiceImpl;
+import com.example.demo.Service.Impl.WeekServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,15 +17,18 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
-public class LessonSaveFacade {
+public class LessonFacade {
 
     private final LessonServiceImpl lessonService;
 
     private final GroupServiceImpl groupService;
 
-    public LessonSaveFacade(LessonServiceImpl lessonService, GroupServiceImpl groupService) {
+    private final WeekServiceImpl weekService;
+
+    public LessonFacade(LessonServiceImpl lessonService, GroupServiceImpl groupService, WeekServiceImpl weekService) {
         this.lessonService = lessonService;
         this.groupService = groupService;
+        this.weekService = weekService;
     }
 
     public ResponseEntity<?> saveFromFile(MultipartFile multipartFile) throws IOException {
@@ -71,6 +77,7 @@ public class LessonSaveFacade {
                 OutputLessonDto outputLessonDto1 = list.get(i+1);
                 if(outputLessonDto.getLesson().equals(outputLessonDto1.getLesson())
                         && outputLessonDto.getClassRoom().equals(outputLessonDto1.getClassRoom())
+                        && outputLessonDto.getType().equals(outputLessonDto1.getType())
                         && outputLessonDto.getTeacherName().equals(outputLessonDto1.getTeacherName().replace("-- продолжение --", ""))
                         && outputLessonDto.getToTime().isBefore(outputLessonDto1.getFromTime())){
                     outputLessonDto.setToTime(outputLessonDto1.getToTime());
@@ -111,6 +118,7 @@ public class LessonSaveFacade {
                         && outputLessonDto.getClassRoom().equals(outputLessonDto1.getClassRoom())
                         && outputLessonDto.getTeacherName().equals(outputLessonDto1.getTeacherName().replace("-- продолжение --", ""))
                         && outputLessonDto.getToTime().isBefore(outputLessonDto1.getFromTime())
+                        && outputLessonDto.getType().equals(outputLessonDto1.getType())
                         && outputLessonDto.getGroup().containsAll(outputLessonDto1.getGroup())){
                     outputLessonDto.setToTime(outputLessonDto1.getToTime());
                     outputLessonDto.getNumber().addAll(outputLessonDto1.getNumber());
@@ -125,7 +133,24 @@ public class LessonSaveFacade {
         return ResponseEntity.ok(map2);
     }
 
-//    public ResponseEntity<?> getLessonForUpdate(UpdateLessonDto updateLessonDto){
-//        List<LessonDto> lessonDtos = lessonService.getUpdateLesson(updateLessonDto.getGroupId());+
-//    }
+    public ResponseEntity<?> getLessonForUpdate(UpdateLessonDto updateLessonDto){
+        List<LessonDto> lessonDtos = lessonService
+                .getUpdateLesson(updateLessonDto.getGroupId(), updateLessonDto.getNameLesson(), updateLessonDto.getType())
+                .stream()
+                .filter(n -> n.getDay().getDayOfWeek().equals(updateLessonDto.getLocalDateTime().getDayOfWeek()))
+                .toList();
+        GetUpdateLessonDto getUpdateLessonDto = new GetUpdateLessonDto();
+        lessonDtos.forEach(n -> {
+            getUpdateLessonDto.setLesson(n.getLesson());
+            getUpdateLessonDto.setType(n.getType());
+            getUpdateLessonDto.setTeacherName(n.getTeacherName());
+            getUpdateLessonDto.setClassRoom(n.getClassRoom());
+            getUpdateLessonDto.setFromTime(n.getFromTime());
+            getUpdateLessonDto.setToTime(n.getToTime());
+            getUpdateLessonDto.setNumber(n.getNumber());
+            getUpdateLessonDto.getIds().add(n.getId());
+            getUpdateLessonDto.getWeeks().add(weekService.findWeekId(n.getFromTime()));
+        });
+        return ResponseEntity.ok(ResponseDto.builder().body(getUpdateLessonDto).build());
+    }
 }

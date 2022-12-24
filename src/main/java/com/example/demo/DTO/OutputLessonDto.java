@@ -23,6 +23,8 @@ public class OutputLessonDto {
 
     private String classRoom;
 
+    private String type;
+
     public OutputLessonDto(LessonDto lessonDto){
         this.number = new ArrayList<>();
         this.id = lessonDto.getId();
@@ -32,5 +34,6 @@ public class OutputLessonDto {
         this.toTime = lessonDto.getToTime();
         this.teacherName = lessonDto.getTeacherName();
         this.classRoom = lessonDto.getClassRoom();
+        this.type = lessonDto.getType();
     }
 }

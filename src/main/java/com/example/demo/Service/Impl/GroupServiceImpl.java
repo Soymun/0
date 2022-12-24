@@ -2,11 +2,19 @@ package com.example.demo.Service.Impl;
 
 import com.example.demo.DTO.GroupDto;
 import com.example.demo.Entity.Group;
+import com.example.demo.Entity.Group_;
 import com.example.demo.Mappers.GroupMapper;
 import com.example.demo.Repositories.GroupRepository;
 import com.example.demo.Service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.util.List;
 
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -20,6 +28,9 @@ public class GroupServiceImpl implements GroupService {
         this.groupRepository = groupRepository;
         this.groupMapper = groupMapper;
     }
+
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Override
     public GroupDto getGroupById(Long id) {
@@ -49,5 +60,18 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupDto saveGroup(GroupDto groupDto) {
         return groupMapper.groupToGroupDto(groupRepository.save(groupMapper.groupDtoToGroup(groupDto)));
+    }
+
+    @Override
+    public List<GroupDto> getGroups(Long page) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<GroupDto> cq = cb.createQuery(GroupDto.class);
+        Root<Group> root = cq.from(Group.class);
+        cq.orderBy(cb.asc(root.get(Group_.NAME)));
+        cq.multiselect(
+                root.get(Group_.ID),
+                root.get(Group_.NAME)
+        );
+        return entityManager.createQuery(cq).setFirstResult((page.intValue()-1)*20).setMaxResults(page.intValue()*20).getResultList();
     }
 }

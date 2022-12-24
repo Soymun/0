@@ -29,31 +29,32 @@ public class LessonServiceSave {
             List<NativeLesson> lessons2 = new ArrayList<>();
             List<String> group = new ArrayList<>();
             int number = 0;
+            int countFirst = 0;
             while(ri.hasNext()) {
                 XSSFRow row = (XSSFRow) ri.next();
 
                 Iterator<Cell> ci = row.cellIterator();
-                int countFirst = 0;
                 int countNext = 0;
                 while(ci.hasNext()) {
                     XSSFCell cell = (XSSFCell) ci.next();
                     if(cell.getCellType() == CellType.STRING){
+                        countFirst++;
                         if(row.getRowNum() == 0 && countFirst > 3){
                             group.add(cell.getStringCellValue());
                         }
-                        else {
+                        if(row.getRowNum() != 0) {
+                            countNext++;
                             if (weekend.contains(cell.getStringCellValue().trim())) {
                                 week = cell.getStringCellValue().trim();
-                            } else if(!cell.getStringCellValue().trim().equals("") && countNext != 3) {
+                            } else if(!cell.getStringCellValue().trim().equals("") && (countNext != 3 && countNext != 2)) {
                                 NativeLesson lesson = new NativeLesson(group.get(cell.getColumnIndex() - 3), cell.getStringCellValue().trim(), (long) number, week);
                                 lessons2.add(lesson);
                             }
-                            countNext++;
                         }
-                        countFirst++;
                     } else if (cell.getCellType() == CellType.NUMERIC) {
                         if(cell.getNumericCellValue() < 10){
                             number = (int) cell.getNumericCellValue();
+                            countNext++;
                         }
                     }
                 }

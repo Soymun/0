@@ -30,9 +30,11 @@ public class LessonDto {
 
     private String classRoom;
 
+    private String type;
+
     private List<Long> group;
 
-    public LessonDto(Long id, String lesson, LocalDateTime day, LocalDateTime fromTime, LocalDateTime toTime, Long number, String teacherName, String classRoom) {
+    public LessonDto(Long id, String lesson, LocalDateTime day, LocalDateTime fromTime, LocalDateTime toTime, Long number, String teacherName, String classRoom, String type) {
         this.id = id;
         this.lesson = lesson;
         this.day = day;
@@ -41,5 +43,6 @@ public class LessonDto {
         this.number = number;
         this.teacherName = teacherName;
         this.classRoom = classRoom;
+        this.type = type;
     }
 }

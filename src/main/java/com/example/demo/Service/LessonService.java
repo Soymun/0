@@ -23,7 +23,7 @@ public interface LessonService {
 
     Map<LessonGroup, String>  saveLessonFromFile(MultipartFile file) throws IOException;
 
-//    List<LessonDto> getUpdateLesson(Long groupId);
+    List<LessonDto> getUpdateLesson(Long groupId, String nameLesson, String type);
 
     void deleteLesson(Long id);
 

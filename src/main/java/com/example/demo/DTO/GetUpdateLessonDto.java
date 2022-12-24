@@ -5,18 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class TeacherLessonDto {
+public class GetUpdateLessonDto {
 
-    private Long id;
+    private List<Long> ids;
 
     private String lesson;
-
-    private LocalDateTime day;
 
     private LocalDateTime fromTime;
 
@@ -28,7 +26,12 @@ public class TeacherLessonDto {
 
     private String classRoom;
 
-    private String group;
+    private List<Long> weeks;
 
     private String type;
+
+    public GetUpdateLessonDto() {
+        this.ids = new ArrayList<>();
+        this.weeks = new ArrayList<>();
+    }
 }

@@ -40,4 +40,12 @@ public class GroupController {
         }
         return ResponseEntity.ok(ResponseDto.builder().body(groupService.updateGroup(groupDto)).build());
     }
+
+    @GetMapping("/groups/{page}")
+    public ResponseEntity<?> getListGroup(@PathVariable Long page){
+        if(page == 0){
+            throw new RuntimeException("Страницы 0 не существует в природе");
+        }
+        return ResponseEntity.ok(ResponseDto.builder().body(groupService.getGroups(page)).build());
+    }
 }

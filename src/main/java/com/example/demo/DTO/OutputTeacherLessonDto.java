@@ -29,6 +29,8 @@ public class OutputTeacherLessonDto {
 
     private Set<String> group;
 
+    private String type;
+
     public OutputTeacherLessonDto(TeacherLessonDto teacherLessonDto) {
         this.number = new ArrayList<>();
         this.group = new HashSet<>();
@@ -41,5 +43,6 @@ public class OutputTeacherLessonDto {
         this.teacherName = teacherLessonDto.getTeacherName();
         this.classRoom = teacherLessonDto.getClassRoom();
         group.add(teacherLessonDto.getGroup());
+        this.type = teacherLessonDto.getType();
     }
 }

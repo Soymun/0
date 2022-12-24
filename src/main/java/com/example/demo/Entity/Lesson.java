@@ -32,4 +32,6 @@ public class Lesson {
     private String teacherName;
 
     private String classRoom;
+
+    private String type;
 }
