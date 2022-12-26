@@ -6,6 +6,7 @@ import com.example.demo.DTO.RegistrationDto;
 import com.example.demo.DTO.UserDto;
 import com.example.demo.Entity.Role;
 import com.example.demo.Entity.User;
+import com.example.demo.Response.ResponseDto;
 import com.example.demo.Security.JwtTokenProvider;
 import com.example.demo.Service.Impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -68,6 +69,20 @@ public class AuthFacade {
         catch (AuthenticationException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public ResponseEntity<?> registrationTeacher(Long id){
+        UserDto userDto = userService.getUserById(id);
+        userDto.setRole(Role.TEACHER);
+        UserDto userDto1 = userService.updateUser(userDto);
+        return ResponseEntity.ok(ResponseDto.builder().body(userDto1).build());
+    }
+
+    public ResponseEntity<?> registrationAdmin(Long id){
+        UserDto userDto = userService.getUserById(id);
+        userDto.setRole(Role.ADMIN);
+        UserDto userDto1 = userService.updateUser(userDto);
+        return ResponseEntity.ok(ResponseDto.builder().body(userDto1).build());
     }
 
 }

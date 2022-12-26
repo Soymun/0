@@ -5,6 +5,8 @@ import com.example.demo.Entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import java.util.List;
+
 public interface UserService extends UserDetailsService {
 
     UserDto getUserById(Long id);
@@ -16,4 +18,6 @@ public interface UserService extends UserDetailsService {
     void deleteUser(Long id);
 
     UserDto saveUser(User user);
+
+    List<UserDto> getUserByGroupId(Long id);
 }

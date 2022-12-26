@@ -31,4 +31,5 @@ public interface LessonService {
 
     void saveLessonGroup(LessonGroup lessonGroup);
 
+    LessonDto getLessonById(Long id);
 }

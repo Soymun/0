@@ -11,6 +11,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+
 
 @Service
 @Transactional
@@ -28,12 +31,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-        return userMapper.userDtoToUser(userRepository.getUserById(id).orElse(new User()));
+        return userMapper.userToUserDto(userRepository.getUserById(id).orElse(new User()));
     }
 
     @Override
     public UserDto getUserByUsername(String username) {
-        return userMapper.userDtoToUser(userRepository.getUserByUsername(username).orElse(new User()));
+        return userMapper.userToUserDto(userRepository.getUserByUsername(username).orElse(new User()));
 
     }
 
@@ -49,7 +52,7 @@ public class UserServiceImpl implements UserService {
         if(userDto.getGroupId() != null){
             user.setGroupId(user.getGroupId());
         }
-        return userMapper.userDtoToUser(userRepository.save(user));
+        return userMapper.userToUserDto(userRepository.save(user));
     }
 
     @Override
@@ -59,7 +62,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto saveUser(User user) {
-        return userMapper.userDtoToUser(userRepository.save(user));
+        return userMapper.userToUserDto(userRepository.save(user));
+    }
+
+    @Override
+    public List<UserDto> getUserByGroupId(Long id) {
+        return userRepository.findUserByGroupId(id).stream().filter(Objects::nonNull).map(userMapper::userToUserDto).toList();
     }
 
     @Override

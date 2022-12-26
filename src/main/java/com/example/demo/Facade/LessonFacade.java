@@ -3,7 +3,7 @@ package com.example.demo.Facade;
 
 import com.example.demo.DTO.*;
 import com.example.demo.Entity.LessonGroup;
-import com.example.demo.Repositories.WeekRepository;
+import com.example.demo.Entity.Week;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.GroupServiceImpl;
 import com.example.demo.Service.Impl.LessonServiceImpl;
@@ -152,5 +152,109 @@ public class LessonFacade {
             getUpdateLessonDto.getWeeks().add(weekService.findWeekId(n.getFromTime()));
         });
         return ResponseEntity.ok(ResponseDto.builder().body(getUpdateLessonDto).build());
+    }
+
+    public ResponseEntity<?> patchLesson(LessonToUpdateDto lesson){
+        lesson.getIds().forEach(
+                n -> {
+                    LessonDto lessonDto = lessonService.getLessonById(n);
+                    if(lesson.getLesson() != null){
+                        lessonDto.setLesson(lesson.getLesson());
+                    }
+                    if(lesson.getTeacher() != null){
+                        lessonDto.setTeacherName(lesson.getTeacher());
+                    }
+                    if(lesson.getClassRoom() != null){
+                        lessonDto.setClassRoom(lesson.getClassRoom());
+                    }
+                    if(lesson.getDayOfWeek() != null && !lesson.getDayOfWeek().getDayOfWeek().equals(lessonDto.getDay().getDayOfWeek())){
+                        int range = lesson.getDayOfWeek().getDayOfWeek().compareTo(lessonDto.getDay().getDayOfWeek());
+                        lessonDto.setDay(lessonDto.getDay().plusDays(range));
+                    }
+                    if(lesson.getFromTime() != null){
+                        lessonDto.setFromTime(lessonDto.getFromTime().withHour(lesson.getFromTime().getHour()).withMinute(lesson.getFromTime().getMinute()));
+                    }
+                    if(lesson.getToTime() != null){
+                        lessonDto.setToTime(lessonDto.getToTime().withHour(lesson.getToTime().getHour()).withMinute(lesson.getToTime().getMinute()));
+
+                    }
+                    if(lesson.getType() != null){
+                        lessonDto.setType(lesson.getType());
+                    }
+                    lessonService.updateLesson(lessonDto);
+                }
+
+        );
+        return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
+    }
+
+    public ResponseEntity<?> updateLesson(LessonDto lessonDto){
+        return ResponseEntity.ok(ResponseDto.builder().body(lessonService.updateLesson(lessonDto)).build());
+        }
+
+    public ResponseEntity<?> addLesson(AddLessonByWeek addLessonByWeek){
+        addLessonByWeek.getWeeks().forEach(n -> {
+            LessonDto lessonDto = new LessonDto();
+            lessonDto.setLesson(addLessonByWeek.getLesson());
+            lessonDto.setNumber(addLessonByWeek.getNumber());
+            lessonDto.setType(addLessonByWeek.getType());
+            lessonDto.setClassRoom(addLessonByWeek.getClassRoom());
+            lessonDto.setTeacherName(addLessonByWeek.getTeacher());
+            Week week = weekService.findWeekById(n);
+            switch (addLessonByWeek.getDay()){
+                    case "ПОНЕДЕЛЬНИК" -> lessonDto.setDay(week.getFromWeek());
+                    case "ВТОРНИК" -> lessonDto.setDay(week.getFromWeek().plusDays(1));
+                    case "СРЕДА" -> lessonDto.setDay(week.getFromWeek().plusDays(2));
+                    case "ЧЕТВЕРГ" -> lessonDto.setDay(week.getFromWeek().plusDays(3));
+                    case "ПЯТНИЦА" -> lessonDto.setDay(week.getFromWeek().plusDays(4));
+                    case "СУББОТА" -> lessonDto.setDay(week.getFromWeek().plusDays(5));
+            }
+            switch (lessonDto.getNumber().intValue()){
+                case 1 -> {
+                    lessonDto.setFromTime(lessonDto.getDay().plusHours(8).plusMinutes(30));
+                    lessonDto.setToTime(lessonDto.getDay().plusHours(10).plusMinutes(0));
+                }
+                case 2 -> {
+                    lessonDto.setFromTime(lessonDto.getDay().plusHours(10).plusMinutes(10));
+                    lessonDto.setToTime(lessonDto.getDay().plusHours(11).plusMinutes(40));
+                }
+                case 3 -> {
+                    lessonDto.setFromTime(lessonDto.getDay().plusHours(11).plusMinutes(50));
+                    lessonDto.setToTime(lessonDto.getDay().plusHours(13).plusMinutes(20));
+                }
+                case 4 -> {
+                    lessonDto.setFromTime(lessonDto.getDay().plusHours(12).plusMinutes(20));
+                    lessonDto.setToTime(lessonDto.getDay().plusHours(13).plusMinutes(50));
+                }
+                case 5 -> {
+                    lessonDto.setFromTime(lessonDto.getDay().plusHours(14).plusMinutes(0));
+                    lessonDto.setToTime(lessonDto.getDay().plusHours(15).plusMinutes(30));
+                }
+                case 6 -> {
+                    lessonDto.setFromTime(lessonDto.getDay().plusHours(15).plusMinutes(40));
+                    lessonDto.setToTime(lessonDto.getDay().plusHours(17).plusMinutes(10));
+                }
+                case 7 -> {
+                    lessonDto.setFromTime(lessonDto.getDay().plusHours(17).plusMinutes(30));
+                    lessonDto.setToTime(lessonDto.getDay().plusHours(19).plusMinutes(0));
+                }
+            }
+            LessonDto savedLesson = lessonService.saveLesson(lessonDto);
+            LessonGroup lessonGroup = new LessonGroup();
+            lessonGroup.setLessonId(savedLesson.getId());
+            lessonGroup.setGroupId(addLessonByWeek.getGroupId());
+            lessonService.saveLessonGroup(lessonGroup);
+        });
+        return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
+    }
+
+    public ResponseEntity<?> deleteLesson(Long id){
+        lessonService.deleteLesson(id);
+        return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
+    }
+
+    public ResponseEntity<?> deleteLessons(List<Long> list){
+        lessonService.deleteLesson(list);
+        return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
     }
 }

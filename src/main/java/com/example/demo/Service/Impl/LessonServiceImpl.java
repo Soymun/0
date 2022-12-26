@@ -200,11 +200,13 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public void deleteLesson(Long id) {
+        lessonGroupRepository.deleteByLessonId(id);
         lessonRepository.deleteById(id);
     }
 
     @Override
     public void deleteLesson(List<Long> ids) {
+        ids.forEach(lessonGroupRepository::deleteByLessonId);
         ids.forEach(lessonRepository::deleteById);
     }
 
@@ -212,4 +214,11 @@ public class LessonServiceImpl implements LessonService {
     public void saveLessonGroup(LessonGroup lessonGroup) {
         lessonGroupRepository.save(lessonGroup);
     }
+
+    @Override
+    public LessonDto getLessonById(Long id) {
+        return lessonMapper.lessonToLessonDto(lessonRepository.getLessonById(id));
+    }
+
+
 }

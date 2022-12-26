@@ -6,10 +6,8 @@ import com.example.demo.DTO.RegistrationDto;
 import com.example.demo.Facade.AuthFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/ytsu")
@@ -30,5 +28,17 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
         return authFacade.login(loginDto);
+    }
+
+    @PostMapping("/teacher/registration/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> registrationTeacher(@PathVariable Long id){
+        return authFacade.registrationTeacher(id);
+    }
+
+    @PostMapping("/admin/registration/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> registrationAdmin(@PathVariable Long id){
+        return authFacade.registrationAdmin(id);
     }
 }
