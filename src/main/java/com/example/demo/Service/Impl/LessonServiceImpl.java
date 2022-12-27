@@ -3,13 +3,15 @@ package com.example.demo.Service.Impl;
 import com.example.demo.DTO.LessonDto;
 import com.example.demo.DTO.TeacherLessonDto;
 import com.example.demo.Entity.*;
+import com.example.demo.Entity.ClassRoom_;
 import com.example.demo.Entity.Group_;
 import com.example.demo.Entity.LessonGroup_;
+import com.example.demo.Entity.LessonName_;
 import com.example.demo.Entity.Lesson_;
+import com.example.demo.Entity.Teacher_;
+import com.example.demo.Entity.Type_;
 import com.example.demo.Mappers.LessonMapper;
-import com.example.demo.Repositories.LessonGroupRepository;
-import com.example.demo.Repositories.LessonRepository;
-import com.example.demo.Repositories.WeekRepository;
+import com.example.demo.Repositories.*;
 import com.example.demo.SaveFromFile.LessonServiceSave;
 import com.example.demo.SaveFromFile.NativeLesson;
 import com.example.demo.Service.LessonService;
@@ -42,16 +44,36 @@ public class LessonServiceImpl implements LessonService {
 
     private final LessonServiceSave lessonServiceSave;
 
+    private final LessonNameRepository lessonNameRepository;
+
+    private final TeacherRepository teacherRepository;
+
+    private final ClassRoomRepository classRoomRepository;
+
+    private final TypeRepository typeRepository;
+
     @PersistenceContext
     EntityManager entityManager;
 
     @Autowired
-    public LessonServiceImpl(LessonRepository lessonRepository, WeekRepository weekRepository, LessonGroupRepository lessonGroupRepository, LessonMapper lessonMapper, LessonServiceSave lessonServiceSave) {
+    public LessonServiceImpl(LessonRepository lessonRepository,
+                             WeekRepository weekRepository,
+                             LessonGroupRepository lessonGroupRepository,
+                             LessonMapper lessonMapper,
+                             LessonServiceSave lessonServiceSave,
+                             LessonNameRepository lessonNameRepository,
+                             TeacherRepository teacherRepository,
+                             ClassRoomRepository classRoomRepository,
+                             TypeRepository typeRepository) {
         this.lessonRepository = lessonRepository;
         this.weekRepository = weekRepository;
         this.lessonGroupRepository = lessonGroupRepository;
         this.lessonMapper = lessonMapper;
         this.lessonServiceSave = lessonServiceSave;
+        this.lessonNameRepository = lessonNameRepository;
+        this.teacherRepository = teacherRepository;
+        this.classRoomRepository = classRoomRepository;
+        this.typeRepository = typeRepository;
     }
 
     @Override
@@ -73,19 +95,23 @@ public class LessonServiceImpl implements LessonService {
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
         Join<LessonGroup, Group> join1 = root.join(LessonGroup_.GROUP);
-        cq.where(cb.and(cb.equal(join.get(Lesson_.TEACHER_NAME), teacher), cb.between(join.get(Lesson_.DAY), day, day2)));
+        Join<Lesson, Teacher> join2 = join.join(Lesson_.TEACHER);
+        Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
+        Join<Lesson, Type> join4 = join.join(Lesson_.TYPE);
+        Join<Lesson, LessonName> join5 = join.join(Lesson_.LESSON);
+        cq.where(cb.and(cb.equal(join2.get(Teacher_.TEACHER_NAME), teacher), cb.between(join.get(Lesson_.DAY), day, day2)));
         cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
         cq.multiselect(
                 join.get(Lesson_.ID),
-                join.get(Lesson_.LESSON),
+                join5.get(LessonName_.NAME),
                 join.get(Lesson_.DAY),
                 join.get(Lesson_.FROM_TIME),
                 join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
-                join.get(Lesson_.TEACHER_NAME),
-                join.get(Lesson_.CLASS_ROOM),
+                join2.get(Teacher_.TEACHER_NAME),
+                join3.get(ClassRoom_.CLASS_ROOM),
                 join1.get(Group_.NAME),
-                join.get(Lesson_.TYPE)
+                join4.get(Type_.TYPE)
         );
         return entityManager.createQuery(cq).getResultList();
     }
@@ -96,18 +122,22 @@ public class LessonServiceImpl implements LessonService {
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
+        Join<Lesson, Teacher> join2 = join.join(Lesson_.TEACHER);
+        Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
+        Join<Lesson, Type> join4 = join.join(Lesson_.TYPE);
+        Join<Lesson, LessonName> join5 = join.join(Lesson_.LESSON);
         cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId), cb.between(join.get(Lesson_.DAY), day, day2)));
         cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
         cq.multiselect(
                 join.get(Lesson_.ID),
-                join.get(Lesson_.LESSON),
+                join5.get(LessonName_.NAME),
                 join.get(Lesson_.DAY),
                 join.get(Lesson_.FROM_TIME),
                 join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
-                join.get(Lesson_.TEACHER_NAME),
-                join.get(Lesson_.CLASS_ROOM),
-                join.get(Lesson_.TYPE)
+                join2.get(Teacher_.TEACHER_NAME),
+                join3.get(ClassRoom_.CLASS_ROOM),
+                join4.get(Type_.TYPE)
         );
 
         return entityManager.createQuery(cq).getResultList();
@@ -121,11 +151,25 @@ public class LessonServiceImpl implements LessonService {
             Week week = weekRepository.findWeekById(nativeLesson.getWeak());
             if(week != null){
                 Lesson lesson = new Lesson();
-                lesson.setLesson(nativeLesson.getLesson());
+                LessonName lessonName = lessonNameRepository.getLessonNameByName(nativeLesson.getLesson())
+                        .orElse(null);
+                lessonName = lessonName == null ? lessonNameRepository.save(new LessonName(nativeLesson.getLesson().trim())) : lessonName;
+                lesson.setLessonsNameId(lessonName.getId());
                 lesson.setNumber(nativeLesson.getNumber());
-                lesson.setTeacherName(nativeLesson.getTeacher());
-                lesson.setClassRoom(nativeLesson.getClassroom());
-                lesson.setType(nativeLesson.getType());
+                Teacher teacher = teacherRepository.getTeacherByTeacherName(nativeLesson.getTeacher()
+                        .replace("-- продолжение --", "")
+                        .trim()).orElse(null);
+                teacher = teacher == null ? teacherRepository.save(new Teacher(nativeLesson.getTeacher()
+                        .replace("-- продолжение --", "").trim())) : teacher;
+                lesson.setTeacherId(teacher.getId());
+                ClassRoom classRoom = classRoomRepository.getClassRoomByClassRoom(nativeLesson.getClassroom())
+                                .orElse(null);
+                classRoom = classRoom == null ? classRoomRepository.save(new ClassRoom(nativeLesson.getClassroom().trim())) : classRoom;
+                lesson.setClassRoomId(classRoom.getId());
+                Type type = typeRepository.getTypeByType(nativeLesson.getType())
+                                .orElse(null);
+                type = type == null ? typeRepository.save(new Type(nativeLesson.getType().trim())) : type;
+                lesson.setTypeId(type.getId());
                 switch (nativeLesson.getDay()){
                     case "ПОНЕДЕЛЬНИК" -> lesson.setDay(week.getFromWeek());
                     case "ВТОРНИК" -> lesson.setDay(week.getFromWeek().plusDays(1));
@@ -179,20 +223,24 @@ public class LessonServiceImpl implements LessonService {
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
+        Join<Lesson, Teacher> join2 = join.join(Lesson_.TEACHER);
+        Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
+        Join<Lesson, Type> join4 = join.join(Lesson_.TYPE);
+        Join<Lesson, LessonName> join5 = join.join(Lesson_.LESSON);
         cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId),
                 cb.equal(join.get(Lesson_.LESSON), nameLesson),
                 cb.equal(join.get(Lesson_.TYPE), type)));
         cq.orderBy(cb.asc(join.get(Lesson_.DAY)));
         cq.multiselect(
                 join.get(Lesson_.ID),
-                join.get(Lesson_.LESSON),
+                join5.get(LessonName_.NAME),
                 join.get(Lesson_.DAY),
                 join.get(Lesson_.FROM_TIME),
                 join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
-                join.get(Lesson_.TEACHER_NAME),
-                join.get(Lesson_.CLASS_ROOM),
-                join.get(Lesson_.TYPE)
+                join2.get(Teacher_.TEACHER_NAME),
+                join3.get(ClassRoom_.CLASS_ROOM),
+                join4.get(Type_.TYPE)
         );
 
         return entityManager.createQuery(cq).getResultList();

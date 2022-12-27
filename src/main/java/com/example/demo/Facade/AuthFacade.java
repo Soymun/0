@@ -5,7 +5,9 @@ import com.example.demo.DTO.LoginDto;
 import com.example.demo.DTO.RegistrationDto;
 import com.example.demo.DTO.UserDto;
 import com.example.demo.Entity.Role;
+import com.example.demo.Entity.Teacher;
 import com.example.demo.Entity.User;
+import com.example.demo.Repositories.TeacherRepository;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Security.JwtTokenProvider;
 import com.example.demo.Service.Impl.UserServiceImpl;
@@ -31,11 +33,14 @@ public class AuthFacade {
 
     private final PasswordEncoder passwordEncoder;
 
-    public AuthFacade(JwtTokenProvider jwtTokenProvider, UserServiceImpl userService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+    private final TeacherRepository teacherRepository;
+
+    public AuthFacade(JwtTokenProvider jwtTokenProvider, UserServiceImpl userService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, TeacherRepository teacherRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
+        this.teacherRepository = teacherRepository;
     }
 
     public ResponseEntity<?> registration(RegistrationDto registrationDto){
@@ -71,8 +76,19 @@ public class AuthFacade {
         }
     }
 
-    public ResponseEntity<?> registrationTeacher(Long id){
+    public ResponseEntity<?> registrationTeacher(Long id, String name){
         UserDto userDto = userService.getUserById(id);
+        Teacher teacher = teacherRepository.getTeacherByTeacherName(name).orElse(null);
+        if(teacher == null){
+            Teacher teacher1 = new Teacher();
+            teacher1.setTeacherName(name);
+            teacher1.setUserId(id);
+            teacherRepository.save(teacher1);
+        }
+        else {
+            teacher.setUserId(id);
+            teacherRepository.save(teacher);
+        }
         userDto.setRole(Role.TEACHER);
         UserDto userDto1 = userService.updateUser(userDto);
         return ResponseEntity.ok(ResponseDto.builder().body(userDto1).build());

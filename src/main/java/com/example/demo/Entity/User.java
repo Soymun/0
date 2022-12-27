@@ -23,9 +23,6 @@ public class User {
 
     private Role role;
 
-    @JsonIgnore
-    private String teacherName;
-
     @ManyToOne
     @JoinColumn(name = "groupId", insertable = false, updatable = false)
     private Group group;

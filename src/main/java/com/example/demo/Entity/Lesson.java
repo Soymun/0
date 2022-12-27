@@ -19,7 +19,12 @@ public class Lesson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String lesson;
+    @Column(name = "lessonsNameId")
+    private Long lessonsNameId;
+
+    @ManyToOne
+    @JoinColumn(name = "lessonsNameId", insertable = false, updatable = false)
+    private LessonName lesson;
 
     private LocalDateTime day;
 
@@ -29,9 +34,24 @@ public class Lesson {
 
     private Long number;
 
-    private String teacherName;
+    @Column(name = "teacherId")
+    private Long teacherId;
 
-    private String classRoom;
+    @ManyToOne
+    @JoinColumn(name = "teacherId", insertable = false, updatable = false)
+    private Teacher teacher;
 
-    private String type;
+    @Column(name = "classRoomId")
+    private Long classRoomId;
+
+    @ManyToOne
+    @JoinColumn(name = "classRoomId", insertable = false, updatable = false)
+    private ClassRoom classRoom;
+
+    @Column(name = "typeId")
+    private Long typeId;
+
+    @ManyToOne
+    @JoinColumn(name = "typeId", insertable = false, updatable = false)
+    private Type type;
 }

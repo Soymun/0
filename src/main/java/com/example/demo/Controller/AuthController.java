@@ -30,10 +30,10 @@ public class AuthController {
         return authFacade.login(loginDto);
     }
 
-    @PostMapping("/teacher/registration/{id}")
+    @PostMapping("/teacher/registration")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> registrationTeacher(@PathVariable Long id){
-        return authFacade.registrationTeacher(id);
+    public ResponseEntity<?> registrationTeacher(@RequestParam Long id, @RequestParam String name){
+        return authFacade.registrationTeacher(id, name);
     }
 
     @PostMapping("/admin/registration/{id}")
