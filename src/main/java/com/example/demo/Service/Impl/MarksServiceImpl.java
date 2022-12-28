@@ -3,6 +3,7 @@ package com.example.demo.Service.Impl;
 
 import com.example.demo.DTO.MarksDto;
 import com.example.demo.Mappers.MarksMapper;
+import com.example.demo.Repositories.LessonNameRepository;
 import com.example.demo.Repositories.MarksRepository;
 import com.example.demo.Service.MarksService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,13 @@ public class MarksServiceImpl implements MarksService {
 
     private final MarksMapper marksMapper;
 
+    private final LessonNameRepository lessonNameRepository;
+
     @Autowired
-    public MarksServiceImpl(MarksRepository marksRepository, MarksMapper marksMapper) {
+    public MarksServiceImpl(MarksRepository marksRepository, MarksMapper marksMapper, LessonNameRepository lessonNameRepository) {
         this.marksRepository = marksRepository;
         this.marksMapper = marksMapper;
+        this.lessonNameRepository = lessonNameRepository;
     }
 
     @Override
@@ -37,8 +41,8 @@ public class MarksServiceImpl implements MarksService {
         if (marksDto.getMark() != 0){
             marksDto1.setMark(marksDto.getMark());
         }
-        if(marksDto.getLesson() != null){
-            marksDto1.setLesson(marksDto.getLesson());
+        if(marksDto.getLessonId() != null){
+            marksDto1.setLessonId(marksDto.getLessonId());
         }
         return marksMapper.marksToMarksDto(marksRepository.save(marksMapper.marksDtoToMarks(marksDto1)));
     }

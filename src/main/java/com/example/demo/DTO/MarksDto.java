@@ -13,7 +13,7 @@ public class MarksDto {
 
     private Long userId;
 
-    private String lesson;
+    private Long lessonId;
 
     private Long mark;
 }

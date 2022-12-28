@@ -24,7 +24,12 @@ public class Marks {
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     private User user;
 
-    private String lesson;
+    @Column(name = "lessonId")
+    private Long lessonId;
+
+    @ManyToOne
+    @JoinColumn(name = "lessonId", insertable = false, updatable = false)
+    private LessonName lessonName;
 
     private Long mark;
 }

@@ -161,7 +161,7 @@ public class LessonServiceSave {
         String lesson = "";
         int i = 1;
         for (;i< strings.length;i++) {
-            if(!strings[i].equals("пр.з") && !strings[i].equals("лаб.") && !strings[i].equals("лек.")){
+            if(!strings[i].contains("пр.з") && !strings[i].contains("лаб.") && !strings[i].contains("лек.")){
                 lesson += " " + strings[i];
             }
             else {
@@ -171,7 +171,7 @@ public class LessonServiceSave {
         list.add(lesson.trim());
         String typeOfLesson = "";
         for (;i< strings.length;i++){
-            if(!strings[i].startsWith("А") && !strings[i].startsWith("Б") && !strings[i].startsWith("В") && !strings[i].startsWith("Г") && !strings[i].startsWith("Д")){
+            if(!strings[i].startsWith("Сп") && !strings[i].startsWith("А") && !strings[i].startsWith("А") && !strings[i].startsWith("Б") && !strings[i].startsWith("В") && !strings[i].startsWith("Г") && !strings[i].startsWith("Д")){
                 typeOfLesson += " " + strings[i];
             }
             else {

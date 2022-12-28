@@ -17,6 +17,7 @@ import com.example.demo.SaveFromFile.NativeLesson;
 import com.example.demo.Service.LessonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional
 public class LessonServiceImpl implements LessonService {
 
     private final LessonRepository lessonRepository;
@@ -79,12 +81,56 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public LessonDto saveLesson(LessonDto lessonDto) {
         Lesson lesson = lessonMapper.lessonDtoToLesson(lessonDto);
+        LessonName lessonName = lessonNameRepository.getLessonNameByName(lessonDto.getLesson())
+                .orElse(null);
+        lessonName = lessonName == null ? lessonNameRepository.save(new LessonName(lessonDto.getLesson().trim())) : lessonName;
+        lesson.setLessonsNameId(lessonName.getId());
+        Teacher teacher = teacherRepository.getTeacherByTeacherName(lessonDto.getTeacherName()
+                .replace("-- продолжение --", "")
+                .trim()).orElse(null);
+        teacher = teacher == null ? teacherRepository.save(new Teacher(lessonDto.getTeacherName()
+                .replace("-- продолжение --", "").trim())) : teacher;
+        lesson.setTeacherId(teacher.getId());
+        ClassRoom classRoom = classRoomRepository.getClassRoomByClassRoom(lessonDto.getClassRoom())
+                .orElse(null);
+        classRoom = classRoom == null ? classRoomRepository.save(new ClassRoom(lessonDto.getClassRoom().trim())) : classRoom;
+        lesson.setClassRoomId(classRoom.getId());
+        Type type = typeRepository.getTypeByType(lessonDto.getType())
+                .orElse(null);
+        type = type == null ? typeRepository.save(new Type(lessonDto.getType().trim())) : type;
+        lesson.setTypeId(type.getId());
         return lessonMapper.lessonToLessonDto(lessonRepository.save(lesson));
     }
 
     @Override
     public LessonDto updateLesson(LessonDto lessonDto) {
-        Lesson lesson = lessonMapper.lessonDtoToLesson(lessonDto);
+        Lesson lesson = lessonRepository.getLessonById(lessonDto.getId());
+        if(lessonDto.getLesson() != null) {
+            LessonName lessonName = lessonNameRepository.getLessonNameByName(lessonDto.getLesson())
+                    .orElse(null);
+            lessonName = lessonName == null ? lessonNameRepository.save(new LessonName(lessonDto.getLesson().trim())) : lessonName;
+            lesson.setLessonsNameId(lessonName.getId());
+        }
+        if(lessonDto.getTeacherName() != null) {
+            Teacher teacher = teacherRepository.getTeacherByTeacherName(lessonDto.getTeacherName()
+                    .replace("-- продолжение --", "")
+                    .trim()).orElse(null);
+            teacher = teacher == null ? teacherRepository.save(new Teacher(lessonDto.getTeacherName()
+                    .replace("-- продолжение --", "").trim())) : teacher;
+            lesson.setTeacherId(teacher.getId());
+        }
+        if(lessonDto.getClassRoom() != null) {
+            ClassRoom classRoom = classRoomRepository.getClassRoomByClassRoom(lessonDto.getClassRoom())
+                    .orElse(null);
+            classRoom = classRoom == null ? classRoomRepository.save(new ClassRoom(lessonDto.getClassRoom().trim())) : classRoom;
+            lesson.setClassRoomId(classRoom.getId());
+        }
+        if(lessonDto.getType() != null) {
+            Type type = typeRepository.getTypeByType(lessonDto.getType())
+                    .orElse(null);
+            type = type == null ? typeRepository.save(new Type(lessonDto.getType().trim())) : type;
+            lesson.setTypeId(type.getId());
+        }
         return lessonMapper.lessonToLessonDto(lessonRepository.save(lesson));
     }
 
@@ -228,8 +274,8 @@ public class LessonServiceImpl implements LessonService {
         Join<Lesson, Type> join4 = join.join(Lesson_.TYPE);
         Join<Lesson, LessonName> join5 = join.join(Lesson_.LESSON);
         cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId),
-                cb.equal(join.get(Lesson_.LESSON), nameLesson),
-                cb.equal(join.get(Lesson_.TYPE), type)));
+                cb.equal(join5.get(LessonName_.NAME), nameLesson),
+                cb.equal(join4.get(Type_.TYPE), type)));
         cq.orderBy(cb.asc(join.get(Lesson_.DAY)));
         cq.multiselect(
                 join.get(Lesson_.ID),

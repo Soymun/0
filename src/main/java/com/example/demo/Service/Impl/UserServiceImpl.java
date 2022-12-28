@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
             user.setRole(userDto.getRole());
         }
         if(userDto.getGroupId() != null){
-            user.setGroupId(user.getGroupId());
+            user.setGroupId(userDto.getGroupId());
         }
         return userMapper.userToUserDto(userRepository.save(user));
     }
