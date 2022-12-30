@@ -33,7 +33,7 @@ public class LessonFacade {
 
     public ResponseEntity<?> saveFromFile(MultipartFile multipartFile) throws IOException {
         Map<LessonGroup, String> map = lessonService.saveLessonFromFile(multipartFile);
-        map.entrySet().stream().forEach(n -> {
+        map.entrySet().stream().parallel().forEach(n -> {
             GroupDto group = groupService.getGroupByName(n.getValue().trim().toUpperCase());
             LessonGroup lessonGroup = n.getKey();
             lessonGroup.setGroupId(group.getId());
@@ -256,5 +256,23 @@ public class LessonFacade {
     public ResponseEntity<?> deleteLessons(List<Long> list){
         lessonService.deleteLesson(list);
         return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
+    }
+
+    public ResponseEntity<?> whereIsMyTeacher(String name){
+        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime day2 = localDateTime.withHour(23).withMinute(59);
+        List<TeacherLessonDto> lessonDtos = lessonService.getLessonForTeacher(name, localDateTime, day2);
+        if(lessonDtos.size() == 0){
+            return ResponseEntity.ok(ResponseDto.builder().body("Учитель уехал на бали").build());
+        }
+        else {
+            Map<LocalDateTime, String> map = new HashMap<>();
+            lessonDtos.forEach(n -> {
+                if(!map.containsKey(n.getFromTime())){
+                    map.put(n.getFromTime(), n.getClassRoom());
+                }
+            });
+            return ResponseEntity.ok(ResponseDto.builder().body(map).build());
+        }
     }
 }

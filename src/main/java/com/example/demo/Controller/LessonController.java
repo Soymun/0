@@ -101,6 +101,22 @@ public class LessonController {
             throw new RuntimeException("Невозможно удалить пару");
         }
         return lessonSaveFacade.deleteLesson(id);
-        
+    }
+
+    @PostMapping("/lessons")
+    @PreAuthorize("hasAuthority('TEACHER')")
+    public ResponseEntity<?> addWeekLesson(@RequestBody AddLessonByWeek addLessonByWeek){
+        if(addLessonByWeek == null){
+            throw new RuntimeException("Невозможно сохранить расписание");
+        }
+        return lessonSaveFacade.addLesson(addLessonByWeek);
+    }
+
+    @GetMapping("/teacher")
+    public ResponseEntity<?> whereIsMyTeacher(@RequestParam String name){
+        if(name.equals("")){
+            throw new RuntimeException("Невозможно найти учителя");
+        }
+        return lessonSaveFacade.whereIsMyTeacher(name);
     }
 }

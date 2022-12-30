@@ -16,6 +16,7 @@ import com.example.demo.SaveFromFile.LessonServiceSave;
 import com.example.demo.SaveFromFile.NativeLesson;
 import com.example.demo.Service.LessonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -193,7 +194,7 @@ public class LessonServiceImpl implements LessonService {
     public Map<LessonGroup, String> saveLessonFromFile(MultipartFile file) throws IOException {
         List<NativeLesson> nativeLessons = lessonServiceSave.getNativeLesson(file.getInputStream()).stream().distinct().toList();
         Map<LessonGroup, String> lessonGroupStringMap = new HashMap<>();
-        for (NativeLesson nativeLesson: nativeLessons){
+        nativeLessons.stream().parallel().forEach(nativeLesson ->{
             Week week = weekRepository.findWeekById(nativeLesson.getWeak());
             if(week != null){
                 Lesson lesson = new Lesson();
@@ -259,7 +260,7 @@ public class LessonServiceImpl implements LessonService {
                 lessonGroup.setLessonId(savedLesson.getId());
                 lessonGroupStringMap.put(lessonGroup, nativeLesson.getGroup().trim());
             }
-        }
+        });
         return lessonGroupStringMap;
     }
 
