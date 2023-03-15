@@ -1,16 +1,13 @@
 package com.example.demo.DTO;
 
-import com.example.demo.Entity.Group;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class LessonDto {
 
@@ -32,7 +29,7 @@ public class LessonDto {
 
     private String type;
 
-    private List<Long> group;
+    private String group;
 
     public LessonDto(Long id, String lesson, LocalDateTime day, LocalDateTime fromTime, LocalDateTime toTime, Long number, String teacherName, String classRoom, String type) {
         this.id = id;
@@ -44,5 +41,18 @@ public class LessonDto {
         this.teacherName = teacherName;
         this.classRoom = classRoom;
         this.type = type;
+    }
+
+    public LessonDto(Long id, String lesson, LocalDateTime day, LocalDateTime fromTime, LocalDateTime toTime, Long number, String teacherName, String classRoom,String group, String type) {
+        this.id = id;
+        this.lesson = lesson;
+        this.day = day;
+        this.fromTime = fromTime;
+        this.toTime = toTime;
+        this.number = number;
+        this.teacherName = teacherName;
+        this.classRoom = classRoom;
+        this.type = type;
+        this.group = group;
     }
 }

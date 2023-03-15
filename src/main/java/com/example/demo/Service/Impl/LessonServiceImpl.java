@@ -1,22 +1,13 @@
 package com.example.demo.Service.Impl;
 
 import com.example.demo.DTO.LessonDto;
-import com.example.demo.DTO.TeacherLessonDto;
 import com.example.demo.Entity.*;
-import com.example.demo.Entity.ClassRoom_;
-import com.example.demo.Entity.Group_;
-import com.example.demo.Entity.LessonGroup_;
-import com.example.demo.Entity.LessonName_;
-import com.example.demo.Entity.Lesson_;
-import com.example.demo.Entity.Teacher_;
-import com.example.demo.Entity.Type_;
 import com.example.demo.Mappers.LessonMapper;
 import com.example.demo.Repositories.*;
 import com.example.demo.SaveFromFile.LessonServiceSave;
 import com.example.demo.SaveFromFile.NativeLesson;
 import com.example.demo.Service.LessonService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,11 +23,15 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class LessonServiceImpl implements LessonService {
 
+
+    private final Map<LessonGroup, String> lessonGroupStringMap = new HashMap<>();
     private final LessonRepository lessonRepository;
 
     private final WeekRepository weekRepository;
@@ -58,94 +53,33 @@ public class LessonServiceImpl implements LessonService {
     @PersistenceContext
     EntityManager entityManager;
 
-    @Autowired
-    public LessonServiceImpl(LessonRepository lessonRepository,
-                             WeekRepository weekRepository,
-                             LessonGroupRepository lessonGroupRepository,
-                             LessonMapper lessonMapper,
-                             LessonServiceSave lessonServiceSave,
-                             LessonNameRepository lessonNameRepository,
-                             TeacherRepository teacherRepository,
-                             ClassRoomRepository classRoomRepository,
-                             TypeRepository typeRepository) {
-        this.lessonRepository = lessonRepository;
-        this.weekRepository = weekRepository;
-        this.lessonGroupRepository = lessonGroupRepository;
-        this.lessonMapper = lessonMapper;
-        this.lessonServiceSave = lessonServiceSave;
-        this.lessonNameRepository = lessonNameRepository;
-        this.teacherRepository = teacherRepository;
-        this.classRoomRepository = classRoomRepository;
-        this.typeRepository = typeRepository;
-    }
-
     @Override
-    public LessonDto saveLesson(LessonDto lessonDto) {
+    public LessonDto saveLesson(LessonDto lessonDto,Long weekId, String day) {
         Lesson lesson = lessonMapper.lessonDtoToLesson(lessonDto);
-        LessonName lessonName = lessonNameRepository.getLessonNameByName(lessonDto.getLesson())
-                .orElse(null);
-        lessonName = lessonName == null ? lessonNameRepository.save(new LessonName(lessonDto.getLesson().trim())) : lessonName;
-        lesson.setLessonsNameId(lessonName.getId());
-        Teacher teacher = teacherRepository.getTeacherByTeacherName(lessonDto.getTeacherName()
-                .replace("-- продолжение --", "")
-                .trim()).orElse(null);
-        teacher = teacher == null ? teacherRepository.save(new Teacher(lessonDto.getTeacherName()
-                .replace("-- продолжение --", "").trim())) : teacher;
-        lesson.setTeacherId(teacher.getId());
-        ClassRoom classRoom = classRoomRepository.getClassRoomByClassRoom(lessonDto.getClassRoom())
-                .orElse(null);
-        classRoom = classRoom == null ? classRoomRepository.save(new ClassRoom(lessonDto.getClassRoom().trim())) : classRoom;
-        lesson.setClassRoomId(classRoom.getId());
-        Type type = typeRepository.getTypeByType(lessonDto.getType())
-                .orElse(null);
-        type = type == null ? typeRepository.save(new Type(lessonDto.getType().trim())) : type;
-        lesson.setTypeId(type.getId());
+        Week week = weekRepository.findWeekById(weekId);
+        modifyLesson(lessonDto, lesson);
+        getTimeByNumberOfLesson(lesson.getNumber(), lesson, week, day);
         return lessonMapper.lessonToLessonDto(lessonRepository.save(lesson));
     }
 
     @Override
     public LessonDto updateLesson(LessonDto lessonDto) {
         Lesson lesson = lessonRepository.getLessonById(lessonDto.getId());
-        if(lessonDto.getLesson() != null) {
-            LessonName lessonName = lessonNameRepository.getLessonNameByName(lessonDto.getLesson())
-                    .orElse(null);
-            lessonName = lessonName == null ? lessonNameRepository.save(new LessonName(lessonDto.getLesson().trim())) : lessonName;
-            lesson.setLessonsNameId(lessonName.getId());
-        }
-        if(lessonDto.getTeacherName() != null) {
-            Teacher teacher = teacherRepository.getTeacherByTeacherName(lessonDto.getTeacherName()
-                    .replace("-- продолжение --", "")
-                    .trim()).orElse(null);
-            teacher = teacher == null ? teacherRepository.save(new Teacher(lessonDto.getTeacherName()
-                    .replace("-- продолжение --", "").trim())) : teacher;
-            lesson.setTeacherId(teacher.getId());
-        }
-        if(lessonDto.getClassRoom() != null) {
-            ClassRoom classRoom = classRoomRepository.getClassRoomByClassRoom(lessonDto.getClassRoom())
-                    .orElse(null);
-            classRoom = classRoom == null ? classRoomRepository.save(new ClassRoom(lessonDto.getClassRoom().trim())) : classRoom;
-            lesson.setClassRoomId(classRoom.getId());
-        }
-        if(lessonDto.getType() != null) {
-            Type type = typeRepository.getTypeByType(lessonDto.getType())
-                    .orElse(null);
-            type = type == null ? typeRepository.save(new Type(lessonDto.getType().trim())) : type;
-            lesson.setTypeId(type.getId());
-        }
+        modifyLesson(lessonDto, lesson);
         return lessonMapper.lessonToLessonDto(lessonRepository.save(lesson));
     }
 
     @Override
-    public List<TeacherLessonDto> getLessonForTeacher(String teacher, LocalDateTime day, LocalDateTime day2) {
+    public List<LessonDto> getLessonForTeacher(String teacher, LocalDateTime day, LocalDateTime day2) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<TeacherLessonDto> cq = cb.createQuery(TeacherLessonDto.class);
+        CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
         Join<LessonGroup, Group> join1 = root.join(LessonGroup_.GROUP);
         Join<Lesson, Teacher> join2 = join.join(Lesson_.TEACHER);
         Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
-        Join<Lesson, Type> join4 = join.join(Lesson_.TYPE);
-        Join<Lesson, LessonName> join5 = join.join(Lesson_.LESSON);
+        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE);
+        Join<Lesson, Courses> join5 = join.join(Lesson_.LESSON);
         cq.where(cb.and(cb.equal(join2.get(Teacher_.TEACHER_NAME), teacher), cb.between(join.get(Lesson_.DAY), day, day2)));
         cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
         cq.multiselect(
@@ -171,8 +105,8 @@ public class LessonServiceImpl implements LessonService {
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
         Join<Lesson, Teacher> join2 = join.join(Lesson_.TEACHER);
         Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
-        Join<Lesson, Type> join4 = join.join(Lesson_.TYPE);
-        Join<Lesson, LessonName> join5 = join.join(Lesson_.LESSON);
+        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE);
+        Join<Lesson, Courses> join5 = join.join(Lesson_.LESSON);
         cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId), cb.between(join.get(Lesson_.DAY), day, day2)));
         cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
         cq.multiselect(
@@ -191,76 +125,20 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public Map<LessonGroup, String> saveLessonFromFile(MultipartFile file) throws IOException {
-        List<NativeLesson> nativeLessons = lessonServiceSave.getNativeLesson(file.getInputStream()).stream().distinct().toList();
-        Map<LessonGroup, String> lessonGroupStringMap = new HashMap<>();
-        nativeLessons.stream().parallel().forEach(nativeLesson ->{
-            Week week = weekRepository.findWeekById(nativeLesson.getWeak());
-            if(week != null){
-                Lesson lesson = new Lesson();
-                LessonName lessonName = lessonNameRepository.getLessonNameByName(nativeLesson.getLesson())
-                        .orElse(null);
-                lessonName = lessonName == null ? lessonNameRepository.save(new LessonName(nativeLesson.getLesson().trim())) : lessonName;
-                lesson.setLessonsNameId(lessonName.getId());
-                lesson.setNumber(nativeLesson.getNumber());
-                Teacher teacher = teacherRepository.getTeacherByTeacherName(nativeLesson.getTeacher()
-                        .replace("-- продолжение --", "")
-                        .trim()).orElse(null);
-                teacher = teacher == null ? teacherRepository.save(new Teacher(nativeLesson.getTeacher()
-                        .replace("-- продолжение --", "").trim())) : teacher;
-                lesson.setTeacherId(teacher.getId());
-                ClassRoom classRoom = classRoomRepository.getClassRoomByClassRoom(nativeLesson.getClassroom())
-                                .orElse(null);
-                classRoom = classRoom == null ? classRoomRepository.save(new ClassRoom(nativeLesson.getClassroom().trim())) : classRoom;
-                lesson.setClassRoomId(classRoom.getId());
-                Type type = typeRepository.getTypeByType(nativeLesson.getType())
-                                .orElse(null);
-                type = type == null ? typeRepository.save(new Type(nativeLesson.getType().trim())) : type;
-                lesson.setTypeId(type.getId());
-                switch (nativeLesson.getDay()){
-                    case "ПОНЕДЕЛЬНИК" -> lesson.setDay(week.getFromWeek());
-                    case "ВТОРНИК" -> lesson.setDay(week.getFromWeek().plusDays(1));
-                    case "СРЕДА" -> lesson.setDay(week.getFromWeek().plusDays(2));
-                    case "ЧЕТВЕРГ" -> lesson.setDay(week.getFromWeek().plusDays(3));
-                    case "ПЯТНИЦА" -> lesson.setDay(week.getFromWeek().plusDays(4));
-                    case "СУББОТА" -> lesson.setDay(week.getFromWeek().plusDays(5));
-                }
-                switch (lesson.getNumber().intValue()){
-                    case 1 -> {
-                        lesson.setFromTime(lesson.getDay().plusHours(8).plusMinutes(30));
-                        lesson.setToTime(lesson.getDay().plusHours(10).plusMinutes(0));
-                    }
-                    case 2 -> {
-                        lesson.setFromTime(lesson.getDay().plusHours(10).plusMinutes(10));
-                        lesson.setToTime(lesson.getDay().plusHours(11).plusMinutes(40));
-                    }
-                    case 3 -> {
-                        lesson.setFromTime(lesson.getDay().plusHours(11).plusMinutes(50));
-                        lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(20));
-                    }
-                    case 4 -> {
-                        lesson.setFromTime(lesson.getDay().plusHours(12).plusMinutes(20));
-                        lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(50));
-                    }
-                    case 5 -> {
-                        lesson.setFromTime(lesson.getDay().plusHours(14).plusMinutes(0));
-                        lesson.setToTime(lesson.getDay().plusHours(15).plusMinutes(30));
-                    }
-                    case 6 -> {
-                        lesson.setFromTime(lesson.getDay().plusHours(15).plusMinutes(40));
-                        lesson.setToTime(lesson.getDay().plusHours(17).plusMinutes(10));
-                    }
-                    case 7 -> {
-                        lesson.setFromTime(lesson.getDay().plusHours(17).plusMinutes(30));
-                        lesson.setToTime(lesson.getDay().plusHours(19).plusMinutes(0));
-                    }
-                }
-                Lesson savedLesson = lessonRepository.save(lesson);
-                LessonGroup lessonGroup = new LessonGroup();
-                lessonGroup.setLessonId(savedLesson.getId());
-                lessonGroupStringMap.put(lessonGroup, nativeLesson.getGroup().trim());
-            }
-        });
+    public Map<LessonGroup, String> saveLessonFromFile(MultipartFile file) throws IOException, InterruptedException, ExecutionException {
+        List<NativeLesson> nativeLessons = lessonServiceSave.getNativeLesson(file.getInputStream(), 4);
+//        nativeLessons.stream(n -> {
+//                Week week = weekRepository.findWeekById(n.getWeak());
+//                if (week != null) {
+//                    Lesson lesson = new Lesson();
+//                    modifyLesson(n, lesson);
+//                    getTimeByNumberOfLesson(lesson.getNumber(), lesson, week, n.getDay());
+//                    Lesson savedLesson = lessonRepository.save(lesson);
+//                    LessonGroup lessonGroup = new LessonGroup();
+//                    lessonGroup.setLessonId(savedLesson.getId());
+//                    lessonGroupStringMap.put(lessonGroup, n.getGroup().trim());
+//                }
+//        });
         return lessonGroupStringMap;
     }
 
@@ -272,8 +150,8 @@ public class LessonServiceImpl implements LessonService {
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
         Join<Lesson, Teacher> join2 = join.join(Lesson_.TEACHER);
         Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
-        Join<Lesson, Type> join4 = join.join(Lesson_.TYPE);
-        Join<Lesson, LessonName> join5 = join.join(Lesson_.LESSON);
+        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE);
+        Join<Lesson, Courses> join5 = join.join(Lesson_.LESSON);
         cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId),
                 cb.equal(join5.get(LessonName_.NAME), nameLesson),
                 cb.equal(join4.get(Type_.TYPE), type)));
@@ -293,6 +171,98 @@ public class LessonServiceImpl implements LessonService {
         return entityManager.createQuery(cq).getResultList();
     }
 
+    private void modifyLesson(NativeLesson nativeLesson, Lesson lesson){
+//        Courses courses = lessonNameRepository.getLessonNameByName(nativeLesson.getLesson())
+//                .orElse(null);
+//        courses = courses == null ? lessonNameRepository.save(new Courses(nativeLesson.getLesson().trim())) : courses;
+//        lesson.setLessonsNameId(courses.getId());
+//        lesson.setNumber(nativeLesson.getNumber());
+//        Teacher teacher = teacherRepository.getTeacherByTeacherName(nativeLesson.getTeacher()
+//                .replace("-- продолжение --", "")
+//                .trim()).orElse(null);
+//        teacher = teacher == null ? teacherRepository.save(new Teacher(nativeLesson.getTeacher()
+//                .replace("-- продолжение --", "").trim())) : teacher;
+//        lesson.setTeacherId(teacher.getId());
+//        ClassRoom classRoom = classRoomRepository.getClassRoomByClassRoom(nativeLesson.getClassroom())
+//                .orElse(null);
+//        classRoom = classRoom == null ? classRoomRepository.save(new ClassRoom(nativeLesson.getClassroom().trim())) : classRoom;
+//        lesson.setClassRoomId(classRoom.getId());
+//        TypeOfLesson typeOfLesson = typeRepository.getTypeByType(nativeLesson.getType())
+//                .orElse(null);
+//        typeOfLesson = typeOfLesson == null ? typeRepository.save(new TypeOfLesson(nativeLesson.getType().trim())) : typeOfLesson;
+//        lesson.setTypeId(typeOfLesson.getId());
+    }
+
+    private void modifyLesson(LessonDto lessonDto, Lesson lesson){
+//        if(lessonDto.getLesson() != null) {
+//            Courses courses = lessonNameRepository.getLessonNameByName(lessonDto.getLesson())
+//                    .orElse(null);
+//            courses = courses == null ? lessonNameRepository.save(new Courses(lessonDto.getLesson().trim())) : courses;
+//            lesson.setLessonsNameId(courses.getId());
+//        }
+//        if(lessonDto.getTeacherName() != null) {
+//            Teacher teacher = teacherRepository.getTeacherByTeacherName(lessonDto.getTeacherName()
+//                    .replace("-- продолжение --", "")
+//                    .trim()).orElse(null);
+//            teacher = teacher == null ? teacherRepository.save(new Teacher(lessonDto.getTeacherName()
+//                    .replace("-- продолжение --", "").trim())) : teacher;
+//            lesson.setTeacherId(teacher.getId());
+//        }
+//        if(lessonDto.getClassRoom() != null) {
+//            ClassRoom classRoom = classRoomRepository.getClassRoomByClassRoom(lessonDto.getClassRoom())
+//                    .orElse(null);
+//            classRoom = classRoom == null ? classRoomRepository.save(new ClassRoom(lessonDto.getClassRoom().trim())) : classRoom;
+//            lesson.setClassRoomId(classRoom.getId());
+//        }
+//        if(lessonDto.getType() != null) {
+//            TypeOfLesson typeOfLesson = typeRepository.getTypeByType(lessonDto.getType())
+//                    .orElse(null);
+//            typeOfLesson = typeOfLesson == null ? typeRepository.save(new TypeOfLesson(lessonDto.getType().trim())) : typeOfLesson;
+//            lesson.setTypeId(typeOfLesson.getId());
+//        }
+    }
+
+
+    private void getTimeByNumberOfLesson(Long numbersOfLesson, Lesson lesson,Week week, String day){
+        switch (day){
+            case "ПОНЕДЕЛЬНИК" -> lesson.setDay(week.getFromWeek());
+            case "ВТОРНИК" -> lesson.setDay(week.getFromWeek().plusDays(1));
+            case "СРЕДА" -> lesson.setDay(week.getFromWeek().plusDays(2));
+            case "ЧЕТВЕРГ" -> lesson.setDay(week.getFromWeek().plusDays(3));
+            case "ПЯТНИЦА" -> lesson.setDay(week.getFromWeek().plusDays(4));
+            case "СУББОТА" -> lesson.setDay(week.getFromWeek().plusDays(5));
+        }
+        switch (numbersOfLesson.intValue()){
+            case 1 -> {
+                lesson.setFromTime(lesson.getDay().plusHours(8).plusMinutes(30));
+                lesson.setToTime(lesson.getDay().plusHours(10).plusMinutes(0));
+            }
+            case 2 -> {
+                lesson.setFromTime(lesson.getDay().plusHours(10).plusMinutes(10));
+                lesson.setToTime(lesson.getDay().plusHours(11).plusMinutes(40));
+            }
+            case 3 -> {
+                lesson.setFromTime(lesson.getDay().plusHours(11).plusMinutes(50));
+                lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(20));
+            }
+            case 4 -> {
+                lesson.setFromTime(lesson.getDay().plusHours(12).plusMinutes(20));
+                lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(50));
+            }
+            case 5 -> {
+                lesson.setFromTime(lesson.getDay().plusHours(14).plusMinutes(0));
+                lesson.setToTime(lesson.getDay().plusHours(15).plusMinutes(30));
+            }
+            case 6 -> {
+                lesson.setFromTime(lesson.getDay().plusHours(15).plusMinutes(40));
+                lesson.setToTime(lesson.getDay().plusHours(17).plusMinutes(10));
+            }
+            case 7 -> {
+                lesson.setFromTime(lesson.getDay().plusHours(17).plusMinutes(30));
+                lesson.setToTime(lesson.getDay().plusHours(19).plusMinutes(0));
+            }
+        }
+    }
     @Override
     public void deleteLesson(Long id) {
         lessonGroupRepository.deleteByLessonId(id);

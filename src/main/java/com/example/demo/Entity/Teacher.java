@@ -1,14 +1,13 @@
 package com.example.demo.Entity;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Teacher {
@@ -19,11 +18,11 @@ public class Teacher {
 
     private String teacherName;
 
-    @Column(name = "userId")
+    @Column(name = "user_id")
     private Long userId;
 
-    @OneToOne
-    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
     public Teacher(String teacherName) {

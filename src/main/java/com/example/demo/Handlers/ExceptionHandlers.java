@@ -10,13 +10,13 @@ import java.util.NoSuchElementException;
 @ControllerAdvice
 public class ExceptionHandlers {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<?> runtime(RuntimeException e){
-        return ResponseEntity.ok(ResponseDto.builder().error(e.getMessage()).build());
-    }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<?> noSuchElements(NoSuchElementException e){
-        return ResponseEntity.ok(ResponseDto.builder().error("Ничего не было найдено").build());
-    }
+//    @ExceptionHandler(RuntimeException.class)
+//    public ResponseEntity<?> runtime(RuntimeException e){
+//        return ResponseEntity.ok(ResponseDto.builder().error(e.getMessage()).build());
+//    }
+//
+//    @ExceptionHandler(NoSuchElementException.class)
+//    public ResponseEntity<?> noSuchElements(NoSuchElementException e){
+//        return ResponseEntity.ok(ResponseDto.builder().error("Ничего не было найдено").build());
+//    }
 }

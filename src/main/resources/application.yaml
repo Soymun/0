@@ -2,7 +2,7 @@ spring:
   datasource:
     username: postgres
     password: qwerty
-    url: jdbc:postgresql://localhost:5432/timetable
+    url: jdbc:postgresql://localhost:5432/postgres
 
   jpa:
     hibernate:

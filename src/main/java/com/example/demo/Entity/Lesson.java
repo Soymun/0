@@ -1,30 +1,28 @@
 package com.example.demo.Entity;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class Lesson {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "lessonsNameId")
-    private Long lessonsNameId;
+    @Column(name = "courses_id")
+    private Long coursesId;
 
-    @ManyToOne
-    @JoinColumn(name = "lessonsNameId", insertable = false, updatable = false)
-    private LessonName lesson;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "courses_id", insertable = false, updatable = false)
+    private Courses courses;
 
     private LocalDateTime day;
 
@@ -34,24 +32,24 @@ public class Lesson {
 
     private Long number;
 
-    @Column(name = "teacherId")
+    @Column(name = "teacher_id")
     private Long teacherId;
 
-    @ManyToOne
-    @JoinColumn(name = "teacherId", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "teacher_id", insertable = false, updatable = false)
     private Teacher teacher;
 
-    @Column(name = "classRoomId")
+    @Column(name = "class_room_id")
     private Long classRoomId;
 
-    @ManyToOne
-    @JoinColumn(name = "classRoomId", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_room_id", insertable = false, updatable = false)
     private ClassRoom classRoom;
 
-    @Column(name = "typeId")
-    private Long typeId;
+    @Column(name = "type_lesson_id")
+    private Long typeLessonId;
 
-    @ManyToOne
-    @JoinColumn(name = "typeId", insertable = false, updatable = false)
-    private Type type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "type_lesson_id", insertable = false, updatable = false)
+    private TypeOfLesson typeOfLesson;
 }

@@ -4,8 +4,6 @@ import com.example.demo.DTO.LessonDto;
 import com.example.demo.Entity.*;
 import org.mapstruct.Mapper;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface LessonMapper {
 
@@ -13,18 +11,18 @@ public interface LessonMapper {
 
     LessonDto lessonToLessonDto(Lesson lesson);
 
-    default LessonName map(String value){
-        return new LessonName(value);
+    default Courses map(String value){
+        return new Courses(value);
     }
 
     default ClassRoom map2(String value){
         return new ClassRoom(value);
     }
-    default Type map3(String value){
-        return new Type(value);
+    default TypeOfLesson map3(String value){
+        return new TypeOfLesson(value);
     }
 
-    default String map4(LessonName value){
+    default String map4(Courses value){
         return value == null ? null : value.getName();
     }
 
@@ -32,7 +30,7 @@ public interface LessonMapper {
         return value == null ? null : value.getClassRoom();
     }
 
-    default String map6(Type value){
+    default String map6(TypeOfLesson value){
         return value == null ? null : value.getType();
     }
 }

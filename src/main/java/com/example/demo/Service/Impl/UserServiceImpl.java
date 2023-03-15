@@ -43,15 +43,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(UserDto userDto) {
         User user = userRepository.getUserById(userDto.getId()).orElseThrow(() -> new RuntimeException("User not found"));
-        if(userDto.getUsername() != null){
-            user.setUsername(userDto.getUsername());
-        }
-        if(userDto.getRole() != null){
-            user.setRole(userDto.getRole());
-        }
-        if(userDto.getGroupId() != null){
-            user.setGroupId(userDto.getGroupId());
-        }
+//        if(userDto.getUsername() != null){
+//            user.setUsername(userDto.getUsername());
+//        }
+//        if(userDto.getRole() != null){
+//            user.setRole(userDto.getRole());
+//        }
+//        if(userDto.getGroupId() != null){
+//            user.setGroupId(userDto.getGroupId());
+//        }
         return userMapper.userToUserDto(userRepository.save(user));
     }
 
@@ -72,10 +72,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if(username == null || username.equals("")){
-            throw new RuntimeException("User not found");
-        }
-        User user = userRepository.getUserByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getRole().authority());
+//        if(username == null || username.equals("")){
+//            throw new RuntimeException("User not found");
+//        }
+//        User user = userRepository.getUserByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+//        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getRole().authority());
+        return null;
     }
 }

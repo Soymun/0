@@ -2,13 +2,15 @@ package com.example.demo.Entity;
 
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Marks {
@@ -17,19 +19,19 @@ public class Marks {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "userId")
+    @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
-    @Column(name = "lessonId")
-    private Long lessonId;
+    @Column(name = "courses_id")
+    private Long courses_id;
 
-    @ManyToOne
-    @JoinColumn(name = "lessonId", insertable = false, updatable = false)
-    private LessonName lessonName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "courses_id", insertable = false, updatable = false)
+    private Courses courses;
 
     private Long mark;
 }

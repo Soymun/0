@@ -2,12 +2,14 @@ package com.example.demo.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
+
+import java.time.LocalDate;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "person")
@@ -17,16 +19,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    private String email;
 
     private String password;
 
+    private String name;
+
+    private String surname;
+
+    private String patronymic;
+
+    private LocalDate birthday;
+
     private Role role;
 
-    @ManyToOne
-    @JoinColumn(name = "groupId", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id", insertable = false, updatable = false)
     private Group group;
 
-    @Column(name = "groupId")
+    @Column(name = "group_id")
     private Long groupId;
 }

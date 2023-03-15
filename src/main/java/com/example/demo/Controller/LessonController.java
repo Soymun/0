@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/ytsu")
@@ -23,7 +24,7 @@ public class LessonController {
 
     @PostMapping("/lesson/file")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveFromFile(@RequestParam MultipartFile multipartFile) throws IOException {
+    public ResponseEntity<?> saveFromFile(@RequestParam MultipartFile multipartFile) throws IOException, InterruptedException, ExecutionException {
         if(!Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xlsx")
                 && !Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xls")){
             throw new RuntimeException("Не тот тип файла");
@@ -47,15 +48,6 @@ public class LessonController {
             throw new RuntimeException("Невозможно найти расписание");
         }
         return lessonSaveFacade.getLessonForTeacher(getLessonDto);
-    }
-
-    @PostMapping("/lesson")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveLesson(@RequestBody LessonDto lessonDto){
-        if(lessonDto == null){
-            throw new RuntimeException("Невозможно сохранить расписание");
-        }
-        return lessonSaveFacade.saveLesson(lessonDto);
     }
 
     @GetMapping("/lessons/update")

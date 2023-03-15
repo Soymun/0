@@ -2,32 +2,32 @@ package com.example.demo.Entity;
 
 
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 @Entity
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-@Table(name = "lessonGroup")
+@Table(name = "lesson_group")
 public class LessonGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "groupId")
+    @Column(name = "group_id")
     private Long groupId;
 
-    @Column(name = "lessonId")
+    @Column(name = "lesson_id")
     private Long lessonId;
 
-    @ManyToOne
-    @JoinColumn(name = "groupId", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id", insertable = false, updatable = false)
     private Group group;
 
-    @ManyToOne
-    @JoinColumn(name = "lessonId", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lesson_id", insertable = false, updatable = false)
     private Lesson lesson;
 }

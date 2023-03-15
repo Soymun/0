@@ -5,6 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 public class OutputLessonDto {
@@ -35,5 +36,18 @@ public class OutputLessonDto {
         this.teacherName = lessonDto.getTeacherName();
         this.classRoom = lessonDto.getClassRoom();
         this.type = lessonDto.getType();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OutputLessonDto that = (OutputLessonDto) o;
+        return Objects.equals(lesson, that.lesson) && Objects.equals(teacherName, that.teacherName) && Objects.equals(classRoom, that.classRoom) && Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lesson, teacherName, classRoom, type);
     }
 }

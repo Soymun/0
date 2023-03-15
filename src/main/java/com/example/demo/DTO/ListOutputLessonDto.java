@@ -3,16 +3,15 @@ package com.example.demo.DTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
 public class ListOutputLessonDto {
 
-    private List<OutputLessonDto> outputLessonDtos;
+    private Map<OutputLessonDto, OutputLessonDto> outputLessonDtos;
 
     public ListOutputLessonDto() {
-        this.outputLessonDtos = new ArrayList<>();
+        this.outputLessonDtos = new LinkedHashMap<>();
     }
 }
