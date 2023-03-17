@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.DTO.MarksDto;
+import com.example.demo.DTO.Marks.MarksDto;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.MarksServiceImpl;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +32,13 @@ public class MarksController {
     @PostMapping("/mark")
     @PreAuthorize("hasAuthority('TEACHER')")
     public ResponseEntity<?> saveMark(@RequestBody MarksDto marksDto){
-        return ResponseEntity.ok(ResponseDto.builder().body(marksService.saveMark(marksDto)).build());
+        return ResponseEntity.ok(ResponseDto.builder().build());
     }
 
     @PutMapping("/mark")
     @PreAuthorize("hasAuthority('TEACHER')")
     public ResponseEntity<?> updateMark(@RequestBody MarksDto marksDto){
-        return ResponseEntity.ok(ResponseDto.builder().body(marksService.updateMarks(marksDto)).build());
+        return ResponseEntity.ok(ResponseDto.builder().body(marksService.updateMarks(null)).build());
     }
 
     @DeleteMapping("/mark/{id}")

@@ -42,7 +42,7 @@ public class LessonServiceImpl implements LessonService {
 
     private final LessonServiceSave lessonServiceSave;
 
-    private final LessonNameRepository lessonNameRepository;
+    private final CoursesRepository coursesRepository;
 
     private final TeacherRepository teacherRepository;
 
@@ -78,22 +78,22 @@ public class LessonServiceImpl implements LessonService {
         Join<LessonGroup, Group> join1 = root.join(LessonGroup_.GROUP);
         Join<Lesson, Teacher> join2 = join.join(Lesson_.TEACHER);
         Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
-        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE);
-        Join<Lesson, Courses> join5 = join.join(Lesson_.LESSON);
-        cq.where(cb.and(cb.equal(join2.get(Teacher_.TEACHER_NAME), teacher), cb.between(join.get(Lesson_.DAY), day, day2)));
-        cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
-        cq.multiselect(
-                join.get(Lesson_.ID),
-                join5.get(LessonName_.NAME),
-                join.get(Lesson_.DAY),
-                join.get(Lesson_.FROM_TIME),
-                join.get(Lesson_.TO_TIME),
-                join.get(Lesson_.NUMBER),
-                join2.get(Teacher_.TEACHER_NAME),
-                join3.get(ClassRoom_.CLASS_ROOM),
-                join1.get(Group_.NAME),
-                join4.get(Type_.TYPE)
-        );
+//        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE);
+//        Join<Lesson, Courses> join5 = join.join(Lesson_.LESSON);
+//        cq.where(cb.and(cb.equal(join2.get(Teacher_.TEACHER_NAME), teacher), cb.between(join.get(Lesson_.DAY), day, day2)));
+//        cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
+//        cq.multiselect(
+//                join.get(Lesson_.ID),
+//                join5.get(LessonName_.NAME),
+//                join.get(Lesson_.DAY),
+//                join.get(Lesson_.FROM_TIME),
+//                join.get(Lesson_.TO_TIME),
+//                join.get(Lesson_.NUMBER),
+//                join2.get(Teacher_.TEACHER_NAME),
+//                join3.get(ClassRoom_.CLASS_ROOM),
+//                join1.get(Group_.NAME),
+//                join4.get(Type_.TYPE)
+//        );
         return entityManager.createQuery(cq).getResultList();
     }
 
@@ -105,21 +105,21 @@ public class LessonServiceImpl implements LessonService {
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
         Join<Lesson, Teacher> join2 = join.join(Lesson_.TEACHER);
         Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
-        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE);
-        Join<Lesson, Courses> join5 = join.join(Lesson_.LESSON);
-        cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId), cb.between(join.get(Lesson_.DAY), day, day2)));
-        cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
-        cq.multiselect(
-                join.get(Lesson_.ID),
-                join5.get(LessonName_.NAME),
-                join.get(Lesson_.DAY),
-                join.get(Lesson_.FROM_TIME),
-                join.get(Lesson_.TO_TIME),
-                join.get(Lesson_.NUMBER),
-                join2.get(Teacher_.TEACHER_NAME),
-                join3.get(ClassRoom_.CLASS_ROOM),
-                join4.get(Type_.TYPE)
-        );
+//        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE);
+//        Join<Lesson, Courses> join5 = join.join(Lesson_.LESSON);
+//        cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId), cb.between(join.get(Lesson_.DAY), day, day2)));
+//        cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.LESSON)),cb.asc(join.get(Lesson_.NUMBER)));
+//        cq.multiselect(
+//                join.get(Lesson_.ID),
+//                join5.get(LessonName_.NAME),
+//                join.get(Lesson_.DAY),
+//                join.get(Lesson_.FROM_TIME),
+//                join.get(Lesson_.TO_TIME),
+//                join.get(Lesson_.NUMBER),
+//                join2.get(Teacher_.TEACHER_NAME),
+//                join3.get(ClassRoom_.CLASS_ROOM),
+//                join4.get(Type_.TYPE)
+//        );
 
         return entityManager.createQuery(cq).getResultList();
     }
@@ -150,23 +150,23 @@ public class LessonServiceImpl implements LessonService {
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
         Join<Lesson, Teacher> join2 = join.join(Lesson_.TEACHER);
         Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
-        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE);
-        Join<Lesson, Courses> join5 = join.join(Lesson_.LESSON);
-        cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId),
-                cb.equal(join5.get(LessonName_.NAME), nameLesson),
-                cb.equal(join4.get(Type_.TYPE), type)));
-        cq.orderBy(cb.asc(join.get(Lesson_.DAY)));
-        cq.multiselect(
-                join.get(Lesson_.ID),
-                join5.get(LessonName_.NAME),
-                join.get(Lesson_.DAY),
-                join.get(Lesson_.FROM_TIME),
-                join.get(Lesson_.TO_TIME),
-                join.get(Lesson_.NUMBER),
-                join2.get(Teacher_.TEACHER_NAME),
-                join3.get(ClassRoom_.CLASS_ROOM),
-                join4.get(Type_.TYPE)
-        );
+//        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE);
+//        Join<Lesson, Courses> join5 = join.join(Lesson_.LESSON);
+//        cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID),groupId),
+//                cb.equal(join5.get(LessonName_.NAME), nameLesson),
+//                cb.equal(join4.get(Type_.TYPE), type)));
+//        cq.orderBy(cb.asc(join.get(Lesson_.DAY)));
+//        cq.multiselect(
+//                join.get(Lesson_.ID),
+//                join5.get(LessonName_.NAME),
+//                join.get(Lesson_.DAY),
+//                join.get(Lesson_.FROM_TIME),
+//                join.get(Lesson_.TO_TIME),
+//                join.get(Lesson_.NUMBER),
+//                join2.get(Teacher_.TEACHER_NAME),
+//                join3.get(ClassRoom_.CLASS_ROOM),
+//                join4.get(Type_.TYPE)
+//        );
 
         return entityManager.createQuery(cq).getResultList();
     }
@@ -233,34 +233,34 @@ public class LessonServiceImpl implements LessonService {
             case "СУББОТА" -> lesson.setDay(week.getFromWeek().plusDays(5));
         }
         switch (numbersOfLesson.intValue()){
-            case 1 -> {
-                lesson.setFromTime(lesson.getDay().plusHours(8).plusMinutes(30));
-                lesson.setToTime(lesson.getDay().plusHours(10).plusMinutes(0));
-            }
-            case 2 -> {
-                lesson.setFromTime(lesson.getDay().plusHours(10).plusMinutes(10));
-                lesson.setToTime(lesson.getDay().plusHours(11).plusMinutes(40));
-            }
-            case 3 -> {
-                lesson.setFromTime(lesson.getDay().plusHours(11).plusMinutes(50));
-                lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(20));
-            }
-            case 4 -> {
-                lesson.setFromTime(lesson.getDay().plusHours(12).plusMinutes(20));
-                lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(50));
-            }
-            case 5 -> {
-                lesson.setFromTime(lesson.getDay().plusHours(14).plusMinutes(0));
-                lesson.setToTime(lesson.getDay().plusHours(15).plusMinutes(30));
-            }
-            case 6 -> {
-                lesson.setFromTime(lesson.getDay().plusHours(15).plusMinutes(40));
-                lesson.setToTime(lesson.getDay().plusHours(17).plusMinutes(10));
-            }
-            case 7 -> {
-                lesson.setFromTime(lesson.getDay().plusHours(17).plusMinutes(30));
-                lesson.setToTime(lesson.getDay().plusHours(19).plusMinutes(0));
-            }
+//            case 1 -> {
+//                lesson.setFromTime(lesson.getDay().plusHours(8).plusMinutes(30));
+//                lesson.setToTime(lesson.getDay().plusHours(10).plusMinutes(0));
+//            }
+//            case 2 -> {
+//                lesson.setFromTime(lesson.getDay().plusHours(10).plusMinutes(10));
+//                lesson.setToTime(lesson.getDay().plusHours(11).plusMinutes(40));
+//            }
+//            case 3 -> {
+//                lesson.setFromTime(lesson.getDay().plusHours(11).plusMinutes(50));
+//                lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(20));
+//            }
+//            case 4 -> {
+//                lesson.setFromTime(lesson.getDay().plusHours(12).plusMinutes(20));
+//                lesson.setToTime(lesson.getDay().plusHours(13).plusMinutes(50));
+//            }
+//            case 5 -> {
+//                lesson.setFromTime(lesson.getDay().plusHours(14).plusMinutes(0));
+//                lesson.setToTime(lesson.getDay().plusHours(15).plusMinutes(30));
+//            }
+//            case 6 -> {
+//                lesson.setFromTime(lesson.getDay().plusHours(15).plusMinutes(40));
+//                lesson.setToTime(lesson.getDay().plusHours(17).plusMinutes(10));
+//            }
+//            case 7 -> {
+//                lesson.setFromTime(lesson.getDay().plusHours(17).plusMinutes(30));
+//                lesson.setToTime(lesson.getDay().plusHours(19).plusMinutes(0));
+//            }
         }
     }
     @Override

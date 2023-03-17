@@ -4,6 +4,7 @@ package com.example.demo.Entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,7 +25,7 @@ public class Lesson {
     @JoinColumn(name = "courses_id", insertable = false, updatable = false)
     private Courses courses;
 
-    private LocalDateTime day;
+    private LocalDate day;
 
     private LocalDateTime fromTime;
 

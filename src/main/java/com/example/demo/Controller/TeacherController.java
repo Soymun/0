@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.DTO.TeacherDto;
+import com.example.demo.DTO.Teacher.TeacherDto;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.TeacherServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

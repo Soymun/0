@@ -3,7 +3,7 @@ package com.example.demo.Facade;
 
 import com.example.demo.DTO.LoginDto;
 import com.example.demo.DTO.RegistrationDto;
-import com.example.demo.DTO.UserDto;
+import com.example.demo.DTO.User.UserDto;
 import com.example.demo.Entity.Role;
 import com.example.demo.Entity.Teacher;
 import com.example.demo.Entity.User;
@@ -44,32 +44,34 @@ public class AuthFacade {
     }
 
     public ResponseEntity<?> registration(RegistrationDto registrationDto){
-        UserDto userDto = userService.getUserByUsername(registrationDto.getUsername());
-        if(userDto.getId() != null){
-            throw new RuntimeException("User already exist");
-        }
-
-        User user = new User();
-        user.setUsername(registrationDto.getUsername());
-        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
-        user.setRole(Role.USER);
-        user.setGroupId(registrationDto.getGroupId());
-        return ResponseEntity.ok(userService.saveUser(user).getId());
+//        UserDto userDto = userService.getUserByUsername(registrationDto.getUsername());
+//        if(userDto.getId() != null){
+//            throw new RuntimeException("User already exist");
+//        }
+//
+//        User user = new User();
+//        user.setUsername(registrationDto.getUsername());
+//        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
+//        user.setRole(Role.USER);
+//        user.setGroupId(registrationDto.getGroupId());
+//        return ResponseEntity.ok(userService.saveUser(user).getId());
+        return null;
     }
 
     public ResponseEntity<?> login(LoginDto loginDto){
         try {
-            UserDto userDto = userService.getUserByUsername(loginDto.getUsername());
-            if(userDto == null){
-                throw new RuntimeException("User not found");
-            }
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-            String token = jwtTokenProvider.createToken(userDto.getUsername(), userDto.getRole());
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", userDto.getId());
-            map.put("role", userDto.getRole());
-            map.put("token", token);
-            return ResponseEntity.ok(map);
+//            UserDto userDto = userService.getUserByUsername(loginDto.getUsername());
+//            if(userDto == null){
+//                throw new RuntimeException("User not found");
+//            }
+//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+//            String token = jwtTokenProvider.createToken(userDto.getUsername(), userDto.getRole());
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("id", userDto.getId());
+//            map.put("role", userDto.getRole());
+//            map.put("token", token);
+//            return ResponseEntity.ok(map);
+            return null;
         }
         catch (AuthenticationException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -90,14 +92,14 @@ public class AuthFacade {
             teacherRepository.save(teacher);
         }
         userDto.setRole(Role.TEACHER);
-        UserDto userDto1 = userService.updateUser(userDto);
+        UserDto userDto1 =null;// userService.updateUser(userDto);
         return ResponseEntity.ok(ResponseDto.builder().body(userDto1).build());
     }
 
     public ResponseEntity<?> registrationAdmin(Long id){
         UserDto userDto = userService.getUserById(id);
         userDto.setRole(Role.ADMIN);
-        UserDto userDto1 = userService.updateUser(userDto);
+        UserDto userDto1 =null;// userService.updateUser(userDto);
         return ResponseEntity.ok(ResponseDto.builder().body(userDto1).build());
     }
 

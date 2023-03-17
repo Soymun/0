@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface LessonNameRepository extends JpaRepository<Courses, Long> {
+public interface CoursesRepository extends JpaRepository<Courses, Long> {
 
     Optional<Courses> getLessonNameByName(String name);
 }

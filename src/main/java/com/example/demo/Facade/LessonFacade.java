@@ -65,7 +65,7 @@ public class LessonFacade {
             getUpdateLessonDto.setToTime(n.getToTime());
             getUpdateLessonDto.setNumber(n.getNumber());
             getUpdateLessonDto.getIds().add(n.getId());
-            getUpdateLessonDto.getWeeks().add(weekService.findWeekId(n.getFromTime()));
+            getUpdateLessonDto.getWeeks().add(weekService.findWeekByDay(n.getFromTime()));
         });
         return ResponseEntity.ok(ResponseDto.builder().body(getUpdateLessonDto).build());
     }

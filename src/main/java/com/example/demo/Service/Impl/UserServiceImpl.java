@@ -1,11 +1,13 @@
 package com.example.demo.Service.Impl;
 
-import com.example.demo.DTO.UserDto;
+import com.example.demo.DTO.User.UserDto;
+import com.example.demo.DTO.User.UserUpdateDto;
 import com.example.demo.Entity.User;
 import com.example.demo.Mappers.UserMapper;
 import com.example.demo.Repositories.UserRepository;
 import com.example.demo.Service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -16,67 +18,95 @@ import java.util.Objects;
 
 
 @Service
-@Transactional
+@Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
 
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
-
     @Override
     public UserDto getUserById(Long id) {
+        log.info("Выдача пользователя с id {}", id);
         return userMapper.userToUserDto(userRepository.getUserById(id).orElse(new User()));
     }
 
     @Override
-    public UserDto getUserByUsername(String username) {
-        return userMapper.userToUserDto(userRepository.getUserByUsername(username).orElse(new User()));
+    public UserDto getUserByEmail(String email) {
+        log.info("Выдача пользователя с email");
+        return userMapper.userToUserDto(userRepository.getUserByEmail(email).orElse(new User()));
 
     }
 
     @Override
-    public UserDto updateUser(UserDto userDto) {
-        User user = userRepository.getUserById(userDto.getId()).orElseThrow(() -> new RuntimeException("User not found"));
-//        if(userDto.getUsername() != null){
-//            user.setUsername(userDto.getUsername());
-//        }
-//        if(userDto.getRole() != null){
-//            user.setRole(userDto.getRole());
-//        }
-//        if(userDto.getGroupId() != null){
-//            user.setGroupId(userDto.getGroupId());
-//        }
-        return userMapper.userToUserDto(userRepository.save(user));
+    public UserDto updateUser(UserUpdateDto userUpdateDto) {
+        log.info("Изменение пользователя с id {}", userUpdateDto.getId());
+        User findUser = userRepository.getUserById(userUpdateDto.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if(userUpdateDto.getEmail() != null){
+            findUser.setEmail(userUpdateDto.getEmail());
+        }
+        if(userUpdateDto.getRole() != null){
+            findUser.setRole(userUpdateDto.getRole());
+        }
+        if(userUpdateDto.getPassword() != null){
+            findUser.setPassword(userUpdateDto.getPassword());
+        }
+        if(userUpdateDto.getName() != null){
+            findUser.setName(userUpdateDto.getName());
+        }
+        if(userUpdateDto.getSurname() != null){
+            findUser.setSurname(userUpdateDto.getSurname());
+        }
+        if(userUpdateDto.getPatronymic() != null){
+            findUser.setPatronymic(userUpdateDto.getPatronymic());
+        }
+        if(userUpdateDto.getBirthday() != null){
+            findUser.setBirthday(userUpdateDto.getBirthday());
+        }
+        if(userUpdateDto.getGroupId() != null){
+            findUser.setGroupId(userUpdateDto.getGroupId());
+        }
+        return userMapper.userToUserDto(userRepository.save(findUser));
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
+        log.info("Удаление пользователя с id {}", id);
         userRepository.deleteById(id);
     }
 
     @Override
     public UserDto saveUser(User user) {
+        log.info("Сохранение пользователя");
         return userMapper.userToUserDto(userRepository.save(user));
     }
 
     @Override
     public List<UserDto> getUserByGroupId(Long id) {
-        return userRepository.findUserByGroupId(id).stream().filter(Objects::nonNull).map(userMapper::userToUserDto).toList();
+        log.info("Выдача пользователей по группе с id {}", id);
+        return userRepository.findUserByGroupId(id)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(userMapper::userToUserDto)
+                .toList();
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        if(username == null || username.equals("")){
-//            throw new RuntimeException("User not found");
-//        }
-//        User user = userRepository.getUserByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-//        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getRole().authority());
-        return null;
+
+        if (username == null || username.equals("")) {
+            throw new RuntimeException("User not found");
+        }
+
+        User user = userRepository
+                .getUserByEmail(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(), user.getPassword(), user.getRole().authority()
+        );
     }
 }

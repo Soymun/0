@@ -1,4 +1,4 @@
-package com.example.demo.DTO;
+package com.example.demo.DTO.Marks;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TeacherDto {
+public class MarksDto {
 
     private Long id;
 
-    private String teacherName;
+    private Long userId;
+
+    private Long coursesId;
+
+    private Long mark;
 }

@@ -21,4 +21,6 @@ public class Group {
     private Long id;
 
     private String name;
+
+    private Long numberCourse;
 }

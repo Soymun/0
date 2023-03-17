@@ -1,8 +1,8 @@
 package com.example.demo.Service;
 
-import com.example.demo.DTO.UserDto;
+import com.example.demo.DTO.User.UserDto;
+import com.example.demo.DTO.User.UserUpdateDto;
 import com.example.demo.Entity.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
@@ -11,9 +11,9 @@ public interface UserService extends UserDetailsService {
 
     UserDto getUserById(Long id);
 
-    UserDto getUserByUsername(String username);
+    UserDto getUserByEmail(String email);
 
-    UserDto updateUser(UserDto userDto);
+    UserDto updateUser(UserUpdateDto userDto);
 
     void deleteUser(Long id);
 
