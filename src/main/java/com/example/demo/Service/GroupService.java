@@ -9,7 +9,7 @@ public interface GroupService {
 
     GroupDto getGroupById(Long id);
 
-    GroupDto getGroupByName(String name);
+    Group getGroupByName(String name);
 
     GroupDto updateGroup(GroupDto groupDto);
 

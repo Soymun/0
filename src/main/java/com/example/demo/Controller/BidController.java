@@ -1,8 +1,8 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.DTO.BidDto;
-import com.example.demo.DTO.TypeOfBidDto;
+import com.example.demo.DTO.Bid.BidDto;
+import com.example.demo.DTO.TypeOfBid.TypeOfBidDto;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.BidServiceImpl;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +22,13 @@ public class BidController {
     @PostMapping("/bid")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<?> saveBid(@RequestBody BidDto bidDto){
-        return ResponseEntity.ok(ResponseDto.builder().body(bidService.saveBid(bidDto)).build());
+        return null;
     }
 
     @PatchMapping("/bid")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> updateBid(@RequestBody BidDto bidDto){
-        return ResponseEntity.ok(ResponseDto.builder().body(bidService.saveBid(bidDto)).build());
+        return null;
     }
 
     @DeleteMapping("/bid/{id}")
@@ -50,34 +50,34 @@ public class BidController {
         return ResponseEntity.ok(ResponseDto.builder().body(bidService.getBidDtoById(id)).build());
     }
 
-    @PostMapping("/typeOfBid")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveTypeOfBid(@RequestBody TypeOfBidDto bidDto){
-        return ResponseEntity.ok(ResponseDto.builder().body(bidService.saveTypeOfBid(bidDto)).build());
-    }
-
-    @PatchMapping("/typeOfBid")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> updateTypeOfBid(@RequestBody TypeOfBidDto bidDto){
-        return ResponseEntity.ok(ResponseDto.builder().body(bidService.updateTypeOfBid(bidDto)).build());
-    }
-
-    @DeleteMapping("/typeOfBid/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> deleteTypeOfBid(@PathVariable Long id){
-        bidService.deleteTypeOfBid(id);
-        return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
-    }
-
-    @GetMapping("/typeOfBid")
-    @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<?> getTypeOfBids(){
-        return ResponseEntity.ok(ResponseDto.builder().body(bidService.getListTypeOfBid()).build());
-    }
-
-    @GetMapping("/typeOfBid/{id}")
-    @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<?> getTypeOfBidById(@PathVariable Long id){
-        return ResponseEntity.ok(ResponseDto.builder().body(bidService.getTypeOfBid(id)).build());
-    }
+//    @PostMapping("/typeOfBid")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    public ResponseEntity<?> saveTypeOfBid(@RequestBody TypeOfBidDto bidDto){
+//        return ResponseEntity.ok(ResponseDto.builder().body(bidService.saveTypeOfBid(bidDto)).build());
+//    }
+//
+//    @PatchMapping("/typeOfBid")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    public ResponseEntity<?> updateTypeOfBid(@RequestBody TypeOfBidDto bidDto){
+//        return ResponseEntity.ok(ResponseDto.builder().body(bidService.updateTypeOfBid(bidDto)).build());
+//    }
+//
+//    @DeleteMapping("/typeOfBid/{id}")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    public ResponseEntity<?> deleteTypeOfBid(@PathVariable Long id){
+//        bidService.deleteTypeOfBid(id);
+//        return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
+//    }
+//
+//    @GetMapping("/typeOfBid")
+//    @PreAuthorize("hasAuthority('USER')")
+//    public ResponseEntity<?> getTypeOfBids(){
+//        return ResponseEntity.ok(ResponseDto.builder().body(bidService.getListTypeOfBid()).build());
+//    }
+//
+//    @GetMapping("/typeOfBid/{id}")
+//    @PreAuthorize("hasAuthority('USER')")
+//    public ResponseEntity<?> getTypeOfBidById(@PathVariable Long id){
+//        return ResponseEntity.ok(ResponseDto.builder().body(bidService.getTypeOfBid(id)).build());
+//    }
 }

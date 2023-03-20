@@ -2,6 +2,7 @@ package com.example.demo.Facade;
 
 
 import com.example.demo.DTO.*;
+import com.example.demo.Entity.Group;
 import com.example.demo.Entity.LessonGroup;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.GroupServiceImpl;
@@ -10,13 +11,15 @@ import com.example.demo.Service.Impl.WeekServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -26,12 +29,10 @@ public class LessonFacade {
     private final LessonServiceImpl lessonService;
     private final WeekServiceImpl weekService;
 
-
-    @Transactional
-    public ResponseEntity<?> saveFromFile(MultipartFile multipartFile) throws IOException, InterruptedException, ExecutionException {
+    public ResponseEntity<?> saveFromFile(MultipartFile multipartFile) throws IOException {
         Map<LessonGroup, String> map = lessonService.saveLessonFromFile(multipartFile);
         map.entrySet().stream().parallel().forEach(n -> {
-            GroupDto group = groupService.getGroupByName(n.getValue().trim().toUpperCase());
+            Group group = groupService.getGroupByName(n.getValue().trim().toUpperCase());
             LessonGroup lessonGroup = n.getKey();
             lessonGroup.setGroupId(group.getId());
             lessonService.saveLessonGroup(lessonGroup);
@@ -45,7 +46,7 @@ public class LessonFacade {
     }
 
     public ResponseEntity<?> getLessonForTeacher(GetLessonTeacher getLessonDto) {
-        List<LessonDto> lessonDtos = lessonService.getLessonForTeacher(getLessonDto.getTeacherName(), getLessonDto.getDay(), getLessonDto.getDay2());
+        List<LessonDto> lessonDtos = lessonService.getLessonForTeacher(getLessonDto.getId(), getLessonDto.getDay(), getLessonDto.getDay2());
         return ResponseEntity.ok(convert(lessonDtos));
     }
 
@@ -71,7 +72,7 @@ public class LessonFacade {
     }
 
     public ResponseEntity<?> patchLesson(LessonToUpdateDto lesson) {
-        lesson.getIds().forEach(
+        lesson.getIds().stream().parallel().forEach(
                 n -> {
                     LessonDto lessonDto = lessonService.getLessonById(n);
                     if (lesson.getLesson() != null) {
@@ -99,7 +100,6 @@ public class LessonFacade {
                     }
                     lessonService.updateLesson(lessonDto);
                 }
-
         );
         return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
     }
@@ -109,7 +109,7 @@ public class LessonFacade {
     }
 
     public ResponseEntity<?> addLesson(AddLessonByWeek addLessonByWeek) {
-        addLessonByWeek.getWeeks().forEach(n -> {
+        addLessonByWeek.getWeeks().stream().parallel().forEach(n -> {
             LessonDto lessonDto = new LessonDto();
             lessonDto.setLesson(addLessonByWeek.getLesson());
             lessonDto.setNumber(addLessonByWeek.getNumber());
@@ -127,18 +127,18 @@ public class LessonFacade {
 
     public ResponseEntity<?> deleteLesson(Long id) {
         lessonService.deleteLesson(id);
-        return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
+        return ResponseEntity.noContent().build();
     }
 
     public ResponseEntity<?> deleteLessons(List<Long> list) {
-        lessonService.deleteLesson(list);
-        return ResponseEntity.ok(ResponseDto.builder().body("Suggest").build());
+        lessonService.deleteLessons(list);
+        return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> whereIsMyTeacher(String name) {
+    public ResponseEntity<?> whereIsMyTeacher(Long id) {
         LocalDateTime localDateTime = LocalDateTime.now();
         LocalDateTime day2 = localDateTime.withHour(23).withMinute(59);
-        List<LessonDto> lessonDtos = lessonService.getLessonForTeacher(name, localDateTime, day2);
+        List<LessonDto> lessonDtos = lessonService.getLessonForTeacher(id, localDateTime, day2);
         if (lessonDtos.size() == 0) {
             return ResponseEntity.ok(ResponseDto.builder().body("Учитель уехал на бали").build());
         } else {
@@ -152,8 +152,8 @@ public class LessonFacade {
         }
     }
 
-    private Map<LocalDateTime, ListOutputLessonDto> convert(List<LessonDto> lessonDtos){
-        Map<LocalDateTime, ListOutputLessonDto> map = new LinkedHashMap<>();
+    private Map<LocalDate, ListOutputLessonDto> convert(List<LessonDto> lessonDtos){
+        Map<LocalDate, ListOutputLessonDto> map = new LinkedHashMap<>();
         lessonDtos.forEach(n -> {
                     ListOutputLessonDto lessonDto = map.getOrDefault(n.getDay(), new ListOutputLessonDto());
                     OutputLessonDto outputLessonDto = new OutputLessonDto(n);

@@ -3,6 +3,7 @@ package com.example.demo.Config;
 import com.example.demo.Security.JwtTokenConfigure;
 import com.example.demo.Security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -18,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableCaching
 @EnableAsync
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {

@@ -1,8 +1,9 @@
 package com.example.demo.Mappers;
 
 
-import com.example.demo.DTO.BidDto;
-import com.example.demo.DTO.TypeOfBidDto;
+import com.example.demo.DTO.Bid.BidDto;
+import com.example.demo.DTO.TypeOfBid.TypeOfBidCreateDto;
+import com.example.demo.DTO.TypeOfBid.TypeOfBidDto;
 import com.example.demo.Entity.Bid;
 import com.example.demo.Entity.TypeOfBid;
 import org.mapstruct.Mapper;
@@ -14,7 +15,7 @@ public interface BidMapper {
 
     Bid bidDtoToBid(BidDto bidDto);
 
-    TypeOfBid typeOfBidDtoToTypeOfBid(TypeOfBidDto type);
+    TypeOfBid typeOfBidCreateDtoToTypeOfBid(TypeOfBidCreateDto type);
 
     TypeOfBidDto typeOfBidToTypeOfBidDto(TypeOfBid type);
 }

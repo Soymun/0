@@ -1,11 +1,10 @@
 package com.example.demo.DTO;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +14,7 @@ public class LessonDto {
 
     private String lesson;
 
-    private LocalDateTime day;
+    private LocalDate day;
 
     private LocalDateTime fromTime;
 
@@ -31,7 +30,7 @@ public class LessonDto {
 
     private String group;
 
-    public LessonDto(Long id, String lesson, LocalDateTime day, LocalDateTime fromTime, LocalDateTime toTime, Long number, String teacherName, String classRoom, String type) {
+    public LessonDto(Long id, String lesson, LocalDate day, LocalDateTime fromTime, LocalDateTime toTime, Long number, String teacherName, String classRoom, String type) {
         this.id = id;
         this.lesson = lesson;
         this.day = day;
@@ -43,9 +42,10 @@ public class LessonDto {
         this.type = type;
     }
 
-    public LessonDto(Long id, String lesson, LocalDateTime day, LocalDateTime fromTime, LocalDateTime toTime, Long number, String teacherName, String classRoom,String group, String type) {
+    public LessonDto(Long id, String lesson, LocalDate day, LocalDateTime fromTime, LocalDateTime toTime, Long number, String teacherName, String classRoom,String group, String type) {
         this.id = id;
         this.lesson = lesson;
+        this.group = group;
         this.day = day;
         this.fromTime = fromTime;
         this.toTime = toTime;
@@ -53,6 +53,5 @@ public class LessonDto {
         this.teacherName = teacherName;
         this.classRoom = classRoom;
         this.type = type;
-        this.group = group;
     }
 }

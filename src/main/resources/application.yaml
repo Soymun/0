@@ -7,7 +7,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    open-in-view: off
+    show-sql: true
 jwt:
   security:
     secret: soymun

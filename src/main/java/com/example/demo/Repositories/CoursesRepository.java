@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface CoursesRepository extends JpaRepository<Courses, Long> {
 
-    Optional<Courses> getLessonNameByName(String name);
+    Optional<Courses> getCoursesByNumberOfCourseAndName(Long numberOfCourse, String name);
 }

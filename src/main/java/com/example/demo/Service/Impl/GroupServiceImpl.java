@@ -7,6 +7,7 @@ import com.example.demo.Mappers.GroupMapper;
 import com.example.demo.Repositories.GroupRepository;
 import com.example.demo.Service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -38,8 +39,9 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupDto getGroupByName(String name) {
-        return groupMapper.groupToGroupDto(groupRepository.getGroupsByName(name).orElseThrow(() -> new RuntimeException("Group not found")));
+    @Cacheable(value = "group", key = "#name")
+    public Group getGroupByName(String name) {
+        return groupRepository.getGroupsByName(name).orElseThrow(() -> new RuntimeException("Group not found"));
 
     }
 

@@ -1,13 +1,16 @@
 package com.example.demo.DTO;
 
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class OutputLessonDto {
 
     private Long id;
@@ -49,5 +52,10 @@ public class OutputLessonDto {
     @Override
     public int hashCode() {
         return Objects.hash(lesson, teacherName, classRoom, type);
+    }
+
+    @Override
+    public String toString() {
+        return "outputLessonDto";
     }
 }

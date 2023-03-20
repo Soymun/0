@@ -1,6 +1,5 @@
 package com.example.demo.SaveFromFile;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
@@ -10,7 +9,6 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,7 +16,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Component
 public class LessonServiceSave {
@@ -26,7 +23,7 @@ public class LessonServiceSave {
     private final List<String> weekend = List.of("ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА");
 
     private List<NativeLesson> list = new ArrayList<>();
-    public List<NativeLesson> getNativeLesson(InputStream file, int countGroups) throws InterruptedException {
+    public List<NativeLesson> getNativeLesson(InputStream file, int countGroups) {
         list = new ArrayList<>();
         try (file) {
             OPCPackage pkg = OPCPackage.open(file);
@@ -178,7 +175,7 @@ public class LessonServiceSave {
         }
     }
 
-    private void createAndAddLesson(long week, String lesson, String type, String classRoom, String teacher, NativeLesson nativeLesson) throws InterruptedException {
+    private void createAndAddLesson(long week, String lesson, String type, String classRoom, String teacher, NativeLesson nativeLesson){
         NativeLesson lesson1 = new NativeLesson(nativeLesson);
         lesson1.setWeak(week);
         lesson1.setLesson(lesson);

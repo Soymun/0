@@ -105,10 +105,7 @@ public class LessonController {
     }
 
     @GetMapping("/teacher")
-    public ResponseEntity<?> whereIsMyTeacher(@RequestParam String name){
-        if(name.equals("")){
-            throw new RuntimeException("Невозможно найти учителя");
-        }
-        return lessonSaveFacade.whereIsMyTeacher(name);
+    public ResponseEntity<?> whereIsMyTeacher(@RequestParam Long id){
+        return lessonSaveFacade.whereIsMyTeacher(id);
     }
 }
