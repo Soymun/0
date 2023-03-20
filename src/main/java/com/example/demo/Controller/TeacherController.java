@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 
+import com.example.demo.DTO.Teacher.TeacherCreateDto;
 import com.example.demo.DTO.Teacher.TeacherDto;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.TeacherServiceImpl;
@@ -24,6 +25,13 @@ public class TeacherController {
     @PreAuthorize("hasAuthority('TEACHER')")
     public ResponseEntity<?> updateTeacher(@RequestBody TeacherDto teacherDto){
         return ResponseEntity.ok(ResponseDto.builder().body(teacherService.updateTeacher(teacherDto)).build());
+    }
+
+    @PostMapping("/teacher")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> saveTeacher(@RequestBody TeacherCreateDto teacherDto){
+        teacherService.saveTeacher(teacherDto);
+        return ResponseEntity.status(201).build();
     }
 
     @DeleteMapping("/teacher/{id}")

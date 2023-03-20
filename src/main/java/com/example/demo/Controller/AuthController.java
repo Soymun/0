@@ -1,8 +1,8 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.DTO.LoginDto;
-import com.example.demo.DTO.RegistrationDto;
+import com.example.demo.DTO.Security.LoginDto;
+import com.example.demo.DTO.Security.RegistrationDto;
 import com.example.demo.Facade.AuthFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

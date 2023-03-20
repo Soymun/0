@@ -1,9 +1,10 @@
-package com.example.demo.DTO;
+package com.example.demo.DTO.Lesson;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor

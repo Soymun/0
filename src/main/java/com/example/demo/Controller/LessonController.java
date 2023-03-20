@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.DTO.*;
+import com.example.demo.DTO.Lesson.*;
 import com.example.demo.Facade.LessonFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/ytsu")
@@ -24,7 +23,7 @@ public class LessonController {
 
     @PostMapping("/lesson/file")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveFromFile(@RequestParam MultipartFile multipartFile) throws IOException, InterruptedException, ExecutionException {
+    public ResponseEntity<?> saveFromFile(@RequestParam MultipartFile multipartFile) throws IOException {
         if(!Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xlsx")
                 && !Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xls")){
             throw new RuntimeException("Не тот тип файла");

@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.DTO.User.UserDto;
+import com.example.demo.DTO.User.UserUpdateDto;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,8 @@ public class UserController {
 
     @PatchMapping("/user")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> updateUser(@RequestBody UserDto userDto){
-        return ResponseEntity.ok(ResponseDto.builder().body(userService.updateUser(null)).build());
+    public ResponseEntity<?> updateUser(@RequestBody UserUpdateDto userDto){
+        return ResponseEntity.ok(ResponseDto.builder().body(userService.updateUser(userDto)).build());
     }
 
     @DeleteMapping("/user/{id}")

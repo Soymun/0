@@ -1,7 +1,7 @@
 package com.example.demo.Mappers;
 
 
-import com.example.demo.DTO.GroupDto;
+import com.example.demo.DTO.Group.GroupDto;
 import com.example.demo.Entity.Group;
 import org.mapstruct.Mapper;
 

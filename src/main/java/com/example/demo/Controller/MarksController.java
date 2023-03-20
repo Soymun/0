@@ -1,7 +1,8 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.DTO.Marks.MarksDto;
+import com.example.demo.DTO.Marks.MarkCreateDto;
+import com.example.demo.DTO.Marks.MarksUpdateDto;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.MarksServiceImpl;
 import org.springframework.http.ResponseEntity;
@@ -23,22 +24,29 @@ public class MarksController {
         return ResponseEntity.ok(ResponseDto.builder().body(marksService.getMarksById(id)).build());
     }
 
-    @GetMapping("/marks/{id}")
+    @GetMapping("/user/marks/{id}")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<?> getMarks(@PathVariable Long id){
         return ResponseEntity.ok(ResponseDto.builder().body(marksService.getMarksByUserId(id)).build());
     }
 
+    @GetMapping("/marks")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<?> getMarksByGroupAndCourses(@RequestParam Long groupId,@RequestParam Long coursesId){
+        return ResponseEntity.ok(ResponseDto.builder().body(marksService.getMarksByCoursesAndGroup(coursesId, groupId)).build());
+    }
+
     @PostMapping("/mark")
     @PreAuthorize("hasAuthority('TEACHER')")
-    public ResponseEntity<?> saveMark(@RequestBody MarksDto marksDto){
+    public ResponseEntity<?> saveMark(@RequestBody MarkCreateDto marksDto){
+        marksService.saveMark(marksDto);
         return ResponseEntity.ok(ResponseDto.builder().build());
     }
 
     @PutMapping("/mark")
     @PreAuthorize("hasAuthority('TEACHER')")
-    public ResponseEntity<?> updateMark(@RequestBody MarksDto marksDto){
-        return ResponseEntity.ok(ResponseDto.builder().body(marksService.updateMarks(null)).build());
+    public ResponseEntity<?> updateMark(@RequestBody MarksUpdateDto marksDto){
+        return ResponseEntity.ok(ResponseDto.builder().body(marksService.updateMarks(marksDto)).build());
     }
 
     @DeleteMapping("/mark/{id}")

@@ -1,6 +1,5 @@
 package com.example.demo.Service.Impl;
 
-import com.example.demo.DTO.LessonDto;
 import com.example.demo.Entity.*;
 import com.example.demo.Repositories.*;
 import lombok.RequiredArgsConstructor;
@@ -99,22 +98,5 @@ public class LessonFindService {
                 lesson.setToTime(lesson.getDay().atStartOfDay().plusHours(19).plusMinutes(0));
             }
         }
-    }
-
-    public void modifyLesson(LessonDto nativeLesson, Lesson lesson) {
-        lesson.setCoursesId(getCourseByNameAndNumberOfCourse(
-                getGroupByName(nativeLesson.getGroup()).getNumberCourse(),
-                nativeLesson.getLesson()
-        ).getId());
-
-        lesson.setNumber(nativeLesson.getNumber());
-
-        lesson.setTeacherId(getTeacherByName(nativeLesson.getTeacherName()
-                .replace("-- продолжение --", "")
-                .trim()).getId());
-
-        lesson.setClassRoomId(getClassRoomByName(nativeLesson.getClassRoom().trim()).getId());
-
-        lesson.setTypeLessonId(getTypeOfLessonByName(nativeLesson.getType().trim()).getId());
     }
 }

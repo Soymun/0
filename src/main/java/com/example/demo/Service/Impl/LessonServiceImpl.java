@@ -1,6 +1,6 @@
 package com.example.demo.Service.Impl;
 
-import com.example.demo.DTO.LessonDto;
+import com.example.demo.DTO.Lesson.LessonDto;
 import com.example.demo.Entity.*;
 import com.example.demo.Mappers.LessonMapper;
 import com.example.demo.Repositories.LessonGroupRepository;

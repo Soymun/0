@@ -1,6 +1,6 @@
 package com.example.demo.Service.Impl;
 
-import com.example.demo.DTO.GroupDto;
+import com.example.demo.DTO.Group.GroupDto;
 import com.example.demo.Entity.Group;
 import com.example.demo.Entity.Group_;
 import com.example.demo.Mappers.GroupMapper;

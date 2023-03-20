@@ -1,8 +1,8 @@
 package com.example.demo.Facade;
 
 
-import com.example.demo.DTO.LoginDto;
-import com.example.demo.DTO.RegistrationDto;
+import com.example.demo.DTO.Security.LoginDto;
+import com.example.demo.DTO.Security.RegistrationDto;
 import com.example.demo.DTO.User.UserDto;
 import com.example.demo.Entity.Role;
 import com.example.demo.Entity.Teacher;

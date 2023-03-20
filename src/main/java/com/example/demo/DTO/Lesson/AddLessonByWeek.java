@@ -1,9 +1,8 @@
-package com.example.demo.DTO;
+package com.example.demo.DTO.Lesson;
 
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data

@@ -1,8 +1,6 @@
 package com.example.demo.Service;
 
-import com.example.demo.DTO.LessonDto;
-import com.example.demo.DTO.TeacherLessonDto;
-import com.example.demo.Entity.Group;
+import com.example.demo.DTO.Lesson.LessonDto;
 import com.example.demo.Entity.LessonGroup;
 import org.springframework.web.multipart.MultipartFile;
 

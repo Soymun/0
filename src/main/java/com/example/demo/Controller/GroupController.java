@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
 
-import com.example.demo.DTO.GroupDto;
+import com.example.demo.DTO.Group.GroupDto;
 import com.example.demo.Response.ResponseDto;
 import com.example.demo.Service.Impl.GroupServiceImpl;
 import org.springframework.http.ResponseEntity;
@@ -52,5 +52,12 @@ public class GroupController {
             throw new RuntimeException("Страницы 0 не существует в природе");
         }
         return ResponseEntity.ok(ResponseDto.builder().body(groupService.getGroups(page)).build());
+    }
+
+    @DeleteMapping("/group/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> deleteGroup(@PathVariable Long id){
+        groupService.deleteGroup(id);
+        return ResponseEntity.noContent().build();
     }
 }

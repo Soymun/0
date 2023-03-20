@@ -1,10 +1,9 @@
-package com.example.demo.DTO;
+package com.example.demo.DTO.Lesson;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 public class GetLessonDto {

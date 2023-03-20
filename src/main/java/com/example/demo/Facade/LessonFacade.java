@@ -1,7 +1,7 @@
 package com.example.demo.Facade;
 
 
-import com.example.demo.DTO.*;
+import com.example.demo.DTO.Lesson.*;
 import com.example.demo.Entity.Group;
 import com.example.demo.Entity.LessonGroup;
 import com.example.demo.Response.ResponseDto;
