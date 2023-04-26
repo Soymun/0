@@ -1,9 +1,14 @@
 package com.example.lessonservice.dto.Lesson;
 
+import com.example.lessonservice.dto.Course;
+import com.example.lessonservice.dto.Teacher;
+import com.example.lessonservice.entity.ClassRoom;
+import com.example.lessonservice.entity.TypeOfLesson;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,24 +18,23 @@ public class GetUpdateLessonDto {
 
     private List<Long> ids;
 
-    private String lesson;
+    private Course course;
 
-    private LocalDateTime fromTime;
+    private LocalDate day;
 
-    private LocalDateTime toTime;
+    private LocalTime fromTime;
+
+    private LocalTime toTime;
 
     private Long number;
 
-    private String teacherName;
+    private Teacher teacher;
 
-    private String classRoom;
+    private ClassRoom classRoom;
 
-    private List<Long> weeks;
-
-    private String type;
+    private TypeOfLesson type;
 
     public GetUpdateLessonDto() {
         this.ids = new ArrayList<>();
-        this.weeks = new ArrayList<>();
     }
 }

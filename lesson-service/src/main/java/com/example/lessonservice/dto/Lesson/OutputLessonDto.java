@@ -1,11 +1,16 @@
 package com.example.lessonservice.dto.Lesson;
 
+import com.example.lessonservice.dto.Course;
+import com.example.lessonservice.dto.Teacher;
+import com.example.lessonservice.entity.ClassRoom;
+import com.example.lessonservice.entity.TypeOfLesson;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,28 +23,29 @@ public class OutputLessonDto {
 
     private Long id;
 
-    private String lesson;
+    private Course course;
 
-    private LocalDateTime fromTime;
+    private LocalDate day;
+    private LocalTime fromTime;
 
-    private LocalDateTime toTime;
+    private LocalTime toTime;
 
     private List<Long> number;
 
-    private String teacherName;
+    private Teacher teacher;
 
-    private String classRoom;
+    private ClassRoom classRoom;
 
-    private String type;
+    private TypeOfLesson type;
 
-    public OutputLessonDto(LessonDto lessonDto){
+    public OutputLessonDto(LessonDto lessonDto, Course course, Teacher teacher){
         this.number = new ArrayList<>();
         this.id = lessonDto.getId();
-        this.lesson = lessonDto.getLesson();
+        this.course = course;
         this.number.add(lessonDto.getNumber());
         this.fromTime = lessonDto.getFromTime();
         this.toTime = lessonDto.getToTime();
-        this.teacherName = lessonDto.getTeacherName();
+        this.teacher = teacher;
         this.classRoom = lessonDto.getClassRoom();
         this.type = lessonDto.getType();
     }
@@ -49,16 +55,11 @@ public class OutputLessonDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OutputLessonDto that = (OutputLessonDto) o;
-        return Objects.equals(lesson, that.lesson) && Objects.equals(teacherName, that.teacherName) && Objects.equals(classRoom, that.classRoom) && Objects.equals(type, that.type);
+        return Objects.equals(course, that.course) && Objects.equals(teacher, that.teacher) && Objects.equals(classRoom, that.classRoom) && Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(lesson, teacherName, classRoom, type);
-    }
-
-    @Override
-    public String toString() {
-        return "outputLessonDto";
+        return Objects.hash(course, teacher, classRoom, type);
     }
 }

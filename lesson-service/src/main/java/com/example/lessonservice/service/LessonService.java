@@ -1,7 +1,9 @@
 package com.example.lessonservice.service;
 
 
+import com.example.lessonservice.dto.Lesson.LessonCreateDto;
 import com.example.lessonservice.dto.Lesson.LessonDto;
+import com.example.lessonservice.dto.Lesson.LessonToUpdateDto;
 import com.example.lessonservice.entity.LessonGroup;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,9 +16,9 @@ import java.util.concurrent.ExecutionException;
 
 public interface LessonService {
 
-    LessonDto saveLesson(LessonDto lessonDto, Long weekId, String day);
+    Long saveLesson(LessonCreateDto lessonDto, Long weekId, String day);
 
-    LessonDto updateLesson(LessonDto lessonDto);
+    void updateLesson(LessonToUpdateDto lessonDto);
 
     List<LessonDto> getLessonForTeacher(Long id, LocalDateTime day, LocalDateTime day2);
 
@@ -24,7 +26,7 @@ public interface LessonService {
 
     Map<LessonGroup, String>  saveLessonFromFile(MultipartFile file) throws IOException, InterruptedException, ExecutionException;
 
-    List<LessonDto> getUpdateLesson(Long groupId, Long coursesId, String type);
+    List<LessonDto> getUpdateLesson(Long groupId, Long coursesId, Long typeId);
 
     void deleteLesson(Long id);
 

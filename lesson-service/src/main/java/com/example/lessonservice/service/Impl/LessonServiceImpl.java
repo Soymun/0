@@ -5,26 +5,21 @@ import com.example.lessonservice.Mapper.LessonMapper;
 import com.example.lessonservice.SaveFromFile.LessonServiceSave;
 import com.example.lessonservice.SaveFromFile.NativeLesson;
 import com.example.lessonservice.dto.Course;
+import com.example.lessonservice.dto.Lesson.LessonCreateDto;
 import com.example.lessonservice.dto.Lesson.LessonDto;
-import com.example.lessonservice.dto.Teacher;
+import com.example.lessonservice.dto.Lesson.LessonToUpdateDto;
 import com.example.lessonservice.entity.*;
 import com.example.lessonservice.repositories.LessonGroupRepository;
 import com.example.lessonservice.repositories.LessonRepository;
 import com.example.lessonservice.service.LessonService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -48,30 +43,55 @@ public class LessonServiceImpl implements LessonService {
 
     private final LessonFindService lessonFindService;
 
-    private final ObjectProvider<RestTemplate> restTemplateObjectProvider;
+    private final RestServiceTemplate restServiceTemplate;
 
     @PersistenceContext
     EntityManager entityManager;
 
-    //TODO: исправить сейв на сейв с неделями
     @Override
-    public LessonDto saveLesson(LessonDto lessonDto, Long weekId, String day) {
+    public Long saveLesson(LessonCreateDto lessonDto, Long weekId, String day) {
         log.info("Сохранение урока");
-        Lesson lesson = lessonMapper.lessonDtoToLesson(lessonDto);
+        Lesson lesson = lessonMapper.lessonCreateDtoToLesson(lessonDto);
         Week week = lessonFindService.getWeekByNumber(weekId);
-        fillLesson(lesson, lessonDto.getNumber(), lessonDto.getTeacherName(), lessonDto.getGroup(), lessonDto.getLesson(), lessonDto.getClassRoom(), lessonDto.getType());
         lessonFindService.setTimeLesson(lesson.getNumber(), lesson);
         lessonFindService.setDayInWeek(day, week, lesson);
-        return lessonMapper.lessonToLessonDto(lessonRepository.save(lesson));
+        return lessonRepository.save(lesson).getId();
     }
 
-    //TODO: исправить апдейт
     @Override
-    public LessonDto updateLesson(LessonDto lessonDto) {
-        log.info("Изменение урока с id {}", lessonDto.getId());
-        Lesson lesson = lessonRepository.getLessonById(lessonDto.getId());
-        fillLesson(lesson, lessonDto.getNumber(), lessonDto.getTeacherName(), lessonDto.getGroup(), lessonDto.getLesson(), lessonDto.getClassRoom(), lessonDto.getType());
-        return lessonMapper.lessonToLessonDto(lessonRepository.save(lesson));
+    public void updateLesson(LessonToUpdateDto lessonToUpdateDto) {
+        lessonToUpdateDto.getIds().stream().parallel().forEach(
+                n -> {
+                    log.info("Изменение урока с id {}", n);
+                    Lesson lesson = lessonRepository.getLessonById(n);
+                    if(lesson != null) {
+                        if (lessonToUpdateDto.getCourseId() != null) {
+                            lesson.setCoursesId(lessonToUpdateDto.getCourseId());
+                        }
+                        if (lessonToUpdateDto.getTeacherId() != null) {
+                            lesson.setTeacherId(lessonToUpdateDto.getTeacherId());
+                        }
+                        if (lessonToUpdateDto.getClassRoomId() != null) {
+                            lesson.setClassRoomId(lessonToUpdateDto.getClassRoomId());
+                        }
+                        if (lessonToUpdateDto.getDayOfWeek() != null && !lessonToUpdateDto.getDayOfWeek().getDayOfWeek().equals(lesson.getDay().getDayOfWeek())) {
+                            int range = lessonToUpdateDto.getDayOfWeek().getDayOfWeek().compareTo(lesson.getDay().getDayOfWeek());
+                            lesson.setDay(lessonToUpdateDto.getDayOfWeek().plusDays(range));
+                        }
+                        if (lessonToUpdateDto.getFromTime() != null) {
+                            lesson.setFromTime(lesson.getFromTime().withHour(lessonToUpdateDto.getFromTime().getHour()).withMinute(lessonToUpdateDto.getFromTime().getMinute()));
+                        }
+                        if (lessonToUpdateDto.getToTime() != null) {
+                            lesson.setToTime(lesson.getToTime().withHour(lessonToUpdateDto.getToTime().getHour()).withMinute(lessonToUpdateDto.getToTime().getMinute()));
+
+                        }
+                        if (lessonToUpdateDto.getTypeId() != null) {
+                            lesson.setTeacherId(lessonToUpdateDto.getTypeId());
+                        }
+                        lessonRepository.save(lesson);
+                    }
+                }
+        );
     }
 
 
@@ -82,18 +102,26 @@ public class LessonServiceImpl implements LessonService {
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
-        Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
-        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE_OF_LESSON);
+        Subquery<ClassRoom> subquery = cq.subquery(ClassRoom.class);
+        Root<ClassRoom> roomRoot = subquery.from(ClassRoom.class);
+        subquery.select(roomRoot);
+
+        Subquery<TypeOfLesson> subqueryType = cq.subquery(TypeOfLesson.class);
+        Root<TypeOfLesson> typeOfLessonRoot = subqueryType.from(TypeOfLesson.class);
+        subqueryType.select(typeOfLessonRoot);
         cq.where(cb.and(cb.equal(join.get(Lesson_.TEACHER_ID), id), cb.between(join.get(Lesson_.DAY), day, day2)));
-        cq.orderBy(cb.asc(join.get(Lesson_.DAY)), cb.asc(join.get(Lesson_.NUMBER)));
+        cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.COURSES_ID)), cb.asc(join.get(Lesson_.NUMBER)));
         cq.multiselect(
                 join.get(Lesson_.ID),
+                join.get(Lesson_.COURSES_ID),
                 join.get(Lesson_.DAY),
                 join.get(Lesson_.FROM_TIME),
                 join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
-                join3.get(ClassRoom_.CLASS_ROOM),
-                join4.get(TypeOfLesson_.TYPE)
+                join.get(Lesson_.TEACHER_ID),
+                subquery,
+                subqueryType,
+                root.get(LessonGroup_.GROUP_ID)
         );
         return entityManager.createQuery(cq).getResultList();
     }
@@ -105,18 +133,28 @@ public class LessonServiceImpl implements LessonService {
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
-        Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
-        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE_OF_LESSON);
+
+        Subquery<ClassRoom> subquery = cq.subquery(ClassRoom.class);
+        Root<ClassRoom> roomRoot = subquery.from(ClassRoom.class);
+        subquery.select(roomRoot);
+
+        Subquery<TypeOfLesson> subqueryType = cq.subquery(TypeOfLesson.class);
+        Root<TypeOfLesson> typeOfLessonRoot = subqueryType.from(TypeOfLesson.class);
+        subqueryType.select(typeOfLessonRoot);
+
         cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID), groupId), cb.between(join.get(Lesson_.DAY), day, day2)));
-        cq.orderBy(cb.asc(join.get(Lesson_.DAY)), cb.asc(join.get(Lesson_.NUMBER)));
+        cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.COURSES_ID)), cb.asc(join.get(Lesson_.NUMBER)));
         cq.multiselect(
                 join.get(Lesson_.ID),
+                join.get(Lesson_.COURSES_ID),
                 join.get(Lesson_.DAY),
                 join.get(Lesson_.FROM_TIME),
                 join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
-                join3.get(ClassRoom_.CLASS_ROOM),
-                join4.get(TypeOfLesson_.TYPE)
+                join.get(Lesson_.TEACHER_ID),
+                subquery,
+                subqueryType,
+                root.get(LessonGroup_.GROUP_ID)
         );
         return entityManager.createQuery(cq).getResultList();
     }
@@ -147,26 +185,34 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public List<LessonDto> getUpdateLesson(Long groupId, Long coursesId, String type) {
+    public List<LessonDto> getUpdateLesson(Long groupId, Long coursesId, Long typeId) {
         log.info("Выдача уроков для изменения для группы с id {}", groupId);
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
-        Join<Lesson, ClassRoom> join3 = join.join(Lesson_.CLASS_ROOM);
-        Join<Lesson, TypeOfLesson> join4 = join.join(Lesson_.TYPE_OF_LESSON);
+        Subquery<ClassRoom> subquery = cq.subquery(ClassRoom.class);
+        Root<ClassRoom> roomRoot = subquery.from(ClassRoom.class);
+        subquery.select(roomRoot);
+
+        Subquery<TypeOfLesson> subqueryType = cq.subquery(TypeOfLesson.class);
+        Root<TypeOfLesson> typeOfLessonRoot = subqueryType.from(TypeOfLesson.class);
+        subqueryType.select(typeOfLessonRoot);
         cq.where(cb.and(cb.equal(root.get(LessonGroup_.GROUP_ID), groupId),
                 cb.equal(join.get(Lesson_.COURSES_ID), coursesId),
-                cb.equal(join4.get(TypeOfLesson_.TYPE), type)));
+                cb.equal(join.get(Lesson_.TYPE_LESSON_ID), typeId)));
         cq.orderBy(cb.asc(join.get(Lesson_.DAY)));
         cq.multiselect(
                 join.get(Lesson_.ID),
+                join.get(Lesson_.COURSES_ID),
                 join.get(Lesson_.DAY),
                 join.get(Lesson_.FROM_TIME),
                 join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
-                join3.get(ClassRoom_.CLASS_ROOM),
-                join4.get(TypeOfLesson_.TYPE)
+                join.get(Lesson_.TEACHER_ID),
+                subquery,
+                subqueryType,
+                root.get(LessonGroup_.GROUP_ID)
         );
         return entityManager.createQuery(cq).getResultList();
     }
@@ -207,27 +253,17 @@ public class LessonServiceImpl implements LessonService {
                             String nameLesson,
                             String classRoom,
                             String type) {
-        Course course = getCourse(group, nameLesson);
+        Course course = restServiceTemplate.getCourse(group, nameLesson);
         lesson.setCoursesId(course.getId());
 
         lesson.setNumber(number);
 
-        lesson.setTeacherId(getTeacher(teacherName
+        lesson.setTeacherId(restServiceTemplate.getTeacher(teacherName
                 .replace("-- продолжение --", "")
                 .trim()).getId());
 
         lesson.setClassRoomId(lessonFindService.getClassRoomByName(classRoom.trim()).getId());
 
         lesson.setTypeLessonId(lessonFindService.getTypeOfLessonByName(type.trim()).getId());
-    }
-
-    private Teacher getTeacher(String nameTeacher){
-        RestTemplate restTemplate = restTemplateObjectProvider.getIfAvailable();
-        return restTemplate.getForObject("http://localhost:8072/teacher/v1/teacher/{teacherName}", Teacher.class, nameTeacher);
-    }
-
-    private Course getCourse(String group, String nameLesson){
-        RestTemplate restTemplate = restTemplateObjectProvider.getIfAvailable();
-        return restTemplate.getForObject("http://localhost:8072/course/v1/course/{groupId}/{nameLesson}", Course.class, group, nameLesson);
     }
 }

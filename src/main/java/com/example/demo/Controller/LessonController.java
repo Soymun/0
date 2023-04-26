@@ -37,7 +37,7 @@ public class LessonController {
         if(getLessonDto == null){
             throw new RuntimeException("Невозможно найти расписание");
         }
-        return lessonSaveFacade.getLesson(getLessonDto);
+        return lessonSaveFacade.get(getLessonDto);
     }
 
     @GetMapping("/teacher/lessons")

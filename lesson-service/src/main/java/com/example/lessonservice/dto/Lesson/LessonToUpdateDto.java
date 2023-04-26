@@ -4,7 +4,8 @@ package com.example.lessonservice.dto.Lesson;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -12,21 +13,22 @@ public class LessonToUpdateDto {
 
     private List<Long> ids;
 
+    private Long courseId;
 
-    private String lesson;
+    private Long classRoomId;
 
-    private String classRoom;
+    private Long teacherId;
 
-    private String teacher;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dayOfWeek;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime dayOfWeek;
+    @JsonFormat(pattern = "HH:mm:ss")
+    private LocalTime fromTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime fromTime;
+    @JsonFormat(pattern = "HH:mm:ss")
+    private LocalTime toTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime toTime;
+    private Long typeId;
 
-    private String type;
+    private Long groupId;
 }

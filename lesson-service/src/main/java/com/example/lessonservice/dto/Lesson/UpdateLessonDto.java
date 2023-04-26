@@ -14,9 +14,9 @@ public class UpdateLessonDto {
 
     private Long groupId;
 
-    private String nameLesson;
+    private Long courseId;
 
-    private String type;
+    private Long typeId;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime localDateTime;

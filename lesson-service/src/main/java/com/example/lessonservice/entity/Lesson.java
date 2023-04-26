@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -26,9 +28,9 @@ public class Lesson {
 
     private LocalDate day;
 
-    private LocalDateTime fromTime;
+    private LocalTime fromTime;
 
-    private LocalDateTime toTime;
+    private LocalTime toTime;
 
     private Long number;
 
@@ -38,14 +40,16 @@ public class Lesson {
     @Column(name = "class_room_id")
     private Long classRoomId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Fetch(FetchMode.JOIN)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "class_room_id", insertable = false, updatable = false)
     private ClassRoom classRoom;
 
     @Column(name = "type_lesson_id")
     private Long typeLessonId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Fetch(FetchMode.JOIN)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "type_lesson_id", insertable = false, updatable = false)
     private TypeOfLesson typeOfLesson;
 }

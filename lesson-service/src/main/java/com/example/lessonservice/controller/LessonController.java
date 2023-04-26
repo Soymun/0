@@ -31,6 +31,15 @@ public class LessonController {
         return lessonSaveFacade.saveFromFile(multipartFile);
     }
 
+    @PostMapping("/lessons")
+    @PreAuthorize("hasAuthority('TEACHER')")
+    public ResponseEntity<?> addWeekLesson(@RequestBody LessonCreateDto lessonCreateDto){
+        if(lessonCreateDto == null){
+            throw new RuntimeException("Невозможно сохранить расписание");
+        }
+        return lessonSaveFacade.saveLesson(lessonCreateDto);
+    }
+
     @GetMapping("/lessons")
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<?> getLesson(@RequestBody GetLessonDto getLessonDto){
@@ -67,15 +76,6 @@ public class LessonController {
         return lessonSaveFacade.patchLesson(lesson);
     }
 
-    @PutMapping("/lesson")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> updateLesson(@RequestBody LessonDto lessonDto){
-        if(lessonDto.getId() == 0){
-            throw new RuntimeException("Невозможно обновить пару");
-        }
-        return lessonSaveFacade.updateLesson(lessonDto);
-    }
-
     @DeleteMapping("/lessons")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteLessons(@RequestBody DeleteLessons deleteLessons){
@@ -92,15 +92,6 @@ public class LessonController {
             throw new RuntimeException("Невозможно удалить пару");
         }
         return lessonSaveFacade.deleteLesson(id);
-    }
-
-    @PostMapping("/lessons")
-    @PreAuthorize("hasAuthority('TEACHER')")
-    public ResponseEntity<?> addWeekLesson(@RequestBody AddLessonByWeek addLessonByWeek){
-        if(addLessonByWeek == null){
-            throw new RuntimeException("Невозможно сохранить расписание");
-        }
-        return lessonSaveFacade.addLesson(addLessonByWeek);
     }
 
     @GetMapping("/teacher")

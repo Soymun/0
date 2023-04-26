@@ -25,4 +25,8 @@ public class ClassRoom {
     public ClassRoom(String classRoom) {
         this.classRoom = classRoom;
     }
+
+    public ClassRoom(Long id) {
+        this.id = id;
+    }
 }

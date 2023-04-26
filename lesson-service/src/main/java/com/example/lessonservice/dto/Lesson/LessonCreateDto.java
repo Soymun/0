@@ -1,12 +1,11 @@
 package com.example.lessonservice.dto.Lesson;
 
-
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class AddLessonByWeek {
+public class LessonCreateDto {
 
     private List<Long> weeks;
 
@@ -14,13 +13,13 @@ public class AddLessonByWeek {
 
     private Long groupId;
 
-    private String lesson;
+    private Long courseId;
 
-    private String classRoom;
+    private Long classRoomId;
 
-    private String teacher;
+    private Long teacherId;
 
     private Long number;
 
-    private String type;
+    private Long typeId;
 }

@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -54,32 +56,32 @@ public class LessonFindService {
     public void setTimeLesson(Long numbersOfLesson, Lesson lesson){
         switch (numbersOfLesson.intValue()) {
             case 1 -> {
-                lesson.setFromTime(lesson.getDay().atStartOfDay().plusHours(8).plusMinutes(30));
-                lesson.setToTime(lesson.getDay().atStartOfDay().plusHours(10).plusMinutes(0));
+                lesson.setFromTime(LocalTime.of(0,0).plusHours(8).plusMinutes(30));
+                lesson.setToTime(LocalTime.of(0,0).plusHours(10).plusMinutes(0));
             }
             case 2 -> {
-                lesson.setFromTime(lesson.getDay().atStartOfDay().plusHours(10).plusMinutes(10));
-                lesson.setToTime(lesson.getDay().atStartOfDay().plusHours(11).plusMinutes(40));
+                lesson.setFromTime(LocalTime.of(0,0).plusHours(10).plusMinutes(10));
+                lesson.setToTime(LocalTime.of(0,0).plusHours(11).plusMinutes(40));
             }
             case 3 -> {
-                lesson.setFromTime(lesson.getDay().atStartOfDay().plusHours(11).plusMinutes(50));
-                lesson.setToTime(lesson.getDay().atStartOfDay().plusHours(13).plusMinutes(20));
+                lesson.setFromTime(LocalTime.of(0,0).plusHours(11).plusMinutes(50));
+                lesson.setToTime(LocalTime.of(0,0).plusHours(13).plusMinutes(20));
             }
             case 4 -> {
-                lesson.setFromTime(lesson.getDay().atStartOfDay().plusHours(12).plusMinutes(20));
-                lesson.setToTime(lesson.getDay().atStartOfDay().plusHours(13).plusMinutes(50));
+                lesson.setFromTime(LocalTime.of(0,0).plusHours(12).plusMinutes(20));
+                lesson.setToTime(LocalTime.of(0,0).plusHours(13).plusMinutes(50));
             }
             case 5 -> {
-                lesson.setFromTime(lesson.getDay().atStartOfDay().plusHours(14).plusMinutes(0));
-                lesson.setToTime(lesson.getDay().atStartOfDay().plusHours(15).plusMinutes(30));
+                lesson.setFromTime(LocalTime.of(0,0).plusHours(14).plusMinutes(0));
+                lesson.setToTime(LocalTime.of(0,0).plusHours(15).plusMinutes(30));
             }
             case 6 -> {
-                lesson.setFromTime(lesson.getDay().atStartOfDay().plusHours(15).plusMinutes(40));
-                lesson.setToTime(lesson.getDay().atStartOfDay().plusHours(17).plusMinutes(10));
+                lesson.setFromTime(LocalTime.of(0,0).plusHours(15).plusMinutes(40));
+                lesson.setToTime(LocalTime.of(0,0).plusHours(17).plusMinutes(10));
             }
             case 7 -> {
-                lesson.setFromTime(lesson.getDay().atStartOfDay().plusHours(17).plusMinutes(30));
-                lesson.setToTime(lesson.getDay().atStartOfDay().plusHours(19).plusMinutes(0));
+                lesson.setFromTime(LocalTime.of(0,0).plusHours(17).plusMinutes(30));
+                lesson.setToTime(LocalTime.of(0,0).plusHours(19).plusMinutes(0));
             }
         }
     }

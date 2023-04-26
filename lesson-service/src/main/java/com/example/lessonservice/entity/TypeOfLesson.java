@@ -20,8 +20,4 @@ public class TypeOfLesson {
     private String type;
 
     private String description;
-
-    public TypeOfLesson(String type) {
-        this.type = type;
-    }
 }
