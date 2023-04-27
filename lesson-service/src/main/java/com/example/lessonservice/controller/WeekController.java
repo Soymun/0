@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/ytsu")
+@RequestMapping("/v1")
 public class WeekController {
 
     private final WeekServiceImpl weekService;
@@ -26,7 +26,7 @@ public class WeekController {
 
     @PatchMapping("/week")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> updateBid(@RequestBody WeekDto weekDto){
+    public ResponseEntity<?> updateWeek(@RequestBody WeekDto weekDto){
         return ResponseEntity.ok(weekService.updateWeek(weekDto));
     }
 
@@ -39,13 +39,13 @@ public class WeekController {
 
     @GetMapping("/week/{id}")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<?> getBiByUserId(@PathVariable Long id){
+    public ResponseEntity<?> getWeekById(@PathVariable Long id){
         return ResponseEntity.ok(weekService.findWeekById(id));
     }
 
     @GetMapping("/week")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<?> getBiById(@RequestBody WeekGetDto weekGetDto){
+    public ResponseEntity<?> getWeekByDay(@RequestBody WeekGetDto weekGetDto){
         return ResponseEntity.ok(weekService.findWeekByDay(weekGetDto.getDay()));
     }
 }

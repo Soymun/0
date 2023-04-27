@@ -1,6 +1,5 @@
 package com.example.lessonservice.dto.Lesson;
 
-import com.example.lessonservice.entity.ClassRoom;
 import com.example.lessonservice.entity.TypeOfLesson;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,7 @@ public class LessonDto {
 
     private Long teacherId;
 
-    private ClassRoom classRoom;
+    private Long classRoomId;
 
     private TypeOfLesson type;
 

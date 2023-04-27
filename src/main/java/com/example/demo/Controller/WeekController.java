@@ -24,7 +24,7 @@ public class WeekController {
         return ResponseEntity.status(201).build();
     }
 
-    @PatchMapping("/bid")
+    @PatchMapping("/week")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> updateBid(@RequestBody WeekDto weekDto){
         return ResponseEntity.ok(ResponseDto.builder().body(weekService.updateWeek(weekDto)).build());

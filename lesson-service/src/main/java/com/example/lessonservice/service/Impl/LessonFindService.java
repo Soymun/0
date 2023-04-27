@@ -1,10 +1,8 @@
 package com.example.lessonservice.service.Impl;
 
-import com.example.lessonservice.entity.ClassRoom;
 import com.example.lessonservice.entity.Lesson;
 import com.example.lessonservice.entity.TypeOfLesson;
 import com.example.lessonservice.entity.Week;
-import com.example.lessonservice.repositories.ClassRoomRepository;
 import com.example.lessonservice.repositories.TypeRepository;
 import com.example.lessonservice.repositories.WeekRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +17,6 @@ import java.time.LocalTime;
 @RequiredArgsConstructor
 public class LessonFindService {
 
-    private final ClassRoomRepository classRoomRepository;
-
     private final TypeRepository typeRepository;
 
     private final WeekRepository weekRepository;
@@ -30,11 +26,6 @@ public class LessonFindService {
         return weekRepository.findById(number).orElseThrow(() -> {
             throw new RuntimeException(String.valueOf(number));
         });
-    }
-
-    @Cacheable(value = "classRoom", key = "#name")
-    public ClassRoom getClassRoomByName(String name) {
-        return classRoomRepository.getClassRoomByClassRoom(name).orElseThrow(() -> {throw new RuntimeException(name);});
     }
 
     @Cacheable(value = "typeOfLesson", key = "#name")

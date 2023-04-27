@@ -102,9 +102,6 @@ public class LessonServiceImpl implements LessonService {
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
-        Subquery<ClassRoom> subquery = cq.subquery(ClassRoom.class);
-        Root<ClassRoom> roomRoot = subquery.from(ClassRoom.class);
-        subquery.select(roomRoot);
 
         Subquery<TypeOfLesson> subqueryType = cq.subquery(TypeOfLesson.class);
         Root<TypeOfLesson> typeOfLessonRoot = subqueryType.from(TypeOfLesson.class);
@@ -119,7 +116,7 @@ public class LessonServiceImpl implements LessonService {
                 join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
                 join.get(Lesson_.TEACHER_ID),
-                subquery,
+                join.get(Lesson_.CLASS_ROOM_ID),
                 subqueryType,
                 root.get(LessonGroup_.GROUP_ID)
         );
@@ -133,10 +130,6 @@ public class LessonServiceImpl implements LessonService {
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
-
-        Subquery<ClassRoom> subquery = cq.subquery(ClassRoom.class);
-        Root<ClassRoom> roomRoot = subquery.from(ClassRoom.class);
-        subquery.select(roomRoot);
 
         Subquery<TypeOfLesson> subqueryType = cq.subquery(TypeOfLesson.class);
         Root<TypeOfLesson> typeOfLessonRoot = subqueryType.from(TypeOfLesson.class);
@@ -152,7 +145,7 @@ public class LessonServiceImpl implements LessonService {
                 join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
                 join.get(Lesson_.TEACHER_ID),
-                subquery,
+                join.get(Lesson_.CLASS_ROOM_ID),
                 subqueryType,
                 root.get(LessonGroup_.GROUP_ID)
         );
@@ -160,7 +153,7 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public Map<LessonGroup, String> saveLessonFromFile(MultipartFile file) throws IOException {
+    public Map<LessonGroup, String> saveLessonFromFile(MultipartFile file, Long universityId) throws IOException {
         log.info("Сохранение уроков из файла");
         List<NativeLesson> nativeLessons = lessonServiceSave.getNativeLesson(file.getInputStream(), 4);
         Map<LessonGroup, String> lessonGroupStringMap = new HashMap<>();
@@ -169,7 +162,7 @@ public class LessonServiceImpl implements LessonService {
             if (week != null) {
                 Lesson lesson = new Lesson();
                 try {
-                    fillLesson(lesson, les.getNumber(), les.getTeacher(), les.getGroup(), les.getLesson(), les.getClassroom(), les.getType());
+                    fillLesson(lesson, les.getNumber(), les.getTeacher(), les.getGroup(), les.getLesson(), les.getClassroom(), les.getType(), universityId);
                     lessonFindService.setDayInWeek(les.getDay(), week, lesson);
                     lessonFindService.setTimeLesson(les.getNumber(), lesson);
                     Lesson savedLesson = lessonRepository.save(lesson);
@@ -191,9 +184,6 @@ public class LessonServiceImpl implements LessonService {
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
         Root<LessonGroup> root = cq.from(LessonGroup.class);
         Join<LessonGroup, Lesson> join = root.join(LessonGroup_.LESSON);
-        Subquery<ClassRoom> subquery = cq.subquery(ClassRoom.class);
-        Root<ClassRoom> roomRoot = subquery.from(ClassRoom.class);
-        subquery.select(roomRoot);
 
         Subquery<TypeOfLesson> subqueryType = cq.subquery(TypeOfLesson.class);
         Root<TypeOfLesson> typeOfLessonRoot = subqueryType.from(TypeOfLesson.class);
@@ -210,7 +200,7 @@ public class LessonServiceImpl implements LessonService {
                 join.get(Lesson_.TO_TIME),
                 join.get(Lesson_.NUMBER),
                 join.get(Lesson_.TEACHER_ID),
-                subquery,
+                join.get(Lesson_.CLASS_ROOM_ID),
                 subqueryType,
                 root.get(LessonGroup_.GROUP_ID)
         );
@@ -240,19 +230,14 @@ public class LessonServiceImpl implements LessonService {
         lessonGroupRepository.save(lessonGroup);
     }
 
-    @Override
-    public LessonDto getLessonById(Long id) {
-        log.info("Выдача урока с id {}", id);
-        return lessonMapper.lessonToLessonDto(lessonRepository.getLessonById(id));
-    }
-
     private void fillLesson(Lesson lesson,
                             Long number,
                             String teacherName,
                             String group,
                             String nameLesson,
                             String classRoom,
-                            String type) {
+                            String type,
+                            Long universityId) {
         Course course = restServiceTemplate.getCourse(group, nameLesson);
         lesson.setCoursesId(course.getId());
 
@@ -262,7 +247,7 @@ public class LessonServiceImpl implements LessonService {
                 .replace("-- продолжение --", "")
                 .trim()).getId());
 
-        lesson.setClassRoomId(lessonFindService.getClassRoomByName(classRoom.trim()).getId());
+        lesson.setClassRoomId(restServiceTemplate.getClassRoomByUniversityIdAndName(universityId, classRoom.trim()).getId());
 
         lesson.setTypeLessonId(lessonFindService.getTypeOfLessonByName(type.trim()).getId());
     }

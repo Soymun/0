@@ -2,6 +2,7 @@ package com.example.demo.Facade;
 
 
 import com.example.demo.DTO.Lesson.*;
+import com.example.demo.DTO.ResponseLesson;
 import com.example.demo.Entity.Group;
 import com.example.demo.Entity.LessonGroup;
 import com.example.demo.Response.ResponseDto;
@@ -43,6 +44,11 @@ public class LessonFacade {
     public ResponseEntity<?> getLesson(GetLessonDto getLessonDto) {
         List<LessonDto> lessonDtos = lessonService.getLesson(getLessonDto.getGroupId(), getLessonDto.getDay(), getLessonDto.getDay2());
         return ResponseEntity.ok(convert(lessonDtos));
+    }
+
+    public ResponseEntity<?> get(GetLessonDto getLessonDto) {
+        List<ResponseLesson> lessonDtos = lessonService.get(getLessonDto.getGroupId(), getLessonDto.getDay(), getLessonDto.getDay2());
+        return ResponseEntity.ok(lessonDtos);
     }
 
     public ResponseEntity<?> getLessonForTeacher(GetLessonTeacher getLessonDto) {

@@ -10,4 +10,6 @@ public class TypeLessonDto {
     private Long id;
 
     private String type;
+
+    private String description;
 }

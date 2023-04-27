@@ -1,5 +1,6 @@
 package com.example.lessonservice.service.Impl;
 
+import com.example.lessonservice.dto.ClassRoom;
 import com.example.lessonservice.dto.Course;
 import com.example.lessonservice.dto.Group;
 import com.example.lessonservice.dto.Teacher;
@@ -24,6 +25,18 @@ public class RestServiceTemplate {
     public Teacher getTeacher(String nameTeacher){
         RestTemplate restTemplate = restTemplateObjectProvider.getObject();
         return restTemplate.getForObject("http://localhost:8072/teacher/v1/teacher/{teacherName}", Teacher.class, nameTeacher);
+    }
+
+    @Cacheable(value = "teacher", key = "{#id, #name}")
+    public ClassRoom getClassRoomByUniversityIdAndName(Long id, String name){
+        RestTemplate restTemplate = restTemplateObjectProvider.getObject();
+        return restTemplate.getForObject("http://localhost:8072/university/v1/classRoom/{id}/{name}", ClassRoom.class, id, name);
+    }
+
+    @Cacheable(value = "teacher", key = "#id")
+    public ClassRoom getClassRoomById(Long id){
+        RestTemplate restTemplate = restTemplateObjectProvider.getObject();
+        return restTemplate.getForObject("http://localhost:8072/university/v1/classRoom/{id}", ClassRoom.class, id);
     }
 
     @Cacheable(value = "teacher", key = "#id")

@@ -1,8 +1,8 @@
 package com.example.lessonservice.dto.Lesson;
 
+import com.example.lessonservice.dto.ClassRoom;
 import com.example.lessonservice.dto.Course;
 import com.example.lessonservice.dto.Teacher;
-import com.example.lessonservice.entity.ClassRoom;
 import com.example.lessonservice.entity.TypeOfLesson;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,7 +38,7 @@ public class OutputLessonDto {
 
     private TypeOfLesson type;
 
-    public OutputLessonDto(LessonDto lessonDto, Course course, Teacher teacher){
+    public OutputLessonDto(LessonDto lessonDto, Course course, Teacher teacher, ClassRoom classRoom){
         this.number = new ArrayList<>();
         this.id = lessonDto.getId();
         this.course = course;
@@ -46,7 +46,7 @@ public class OutputLessonDto {
         this.fromTime = lessonDto.getFromTime();
         this.toTime = lessonDto.getToTime();
         this.teacher = teacher;
-        this.classRoom = lessonDto.getClassRoom();
+        this.classRoom = classRoom;
         this.type = lessonDto.getType();
     }
 

@@ -40,11 +40,6 @@ public class Lesson {
     @Column(name = "class_room_id")
     private Long classRoomId;
 
-    @Fetch(FetchMode.JOIN)
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "class_room_id", insertable = false, updatable = false)
-    private ClassRoom classRoom;
-
     @Column(name = "type_lesson_id")
     private Long typeLessonId;
 

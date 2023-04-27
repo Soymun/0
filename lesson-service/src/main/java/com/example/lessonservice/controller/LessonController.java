@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/ytsu")
+@RequestMapping("/v1")
 public class LessonController {
 
     private final LessonFacade lessonSaveFacade;
@@ -23,12 +23,12 @@ public class LessonController {
 
     @PostMapping("/lesson/file")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveFromFile(@RequestParam MultipartFile multipartFile) throws IOException {
+    public ResponseEntity<?> saveFromFile(@RequestParam MultipartFile multipartFile, @RequestParam Long id) throws IOException {
         if(!Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xlsx")
                 && !Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xls")){
             throw new RuntimeException("Не тот тип файла");
         }
-        return lessonSaveFacade.saveFromFile(multipartFile);
+        return lessonSaveFacade.saveFromFile(multipartFile, id);
     }
 
     @PostMapping("/lessons")

@@ -1,9 +1,9 @@
 package com.example.lessonservice.facade;
 
 
+import com.example.lessonservice.dto.ClassRoom;
 import com.example.lessonservice.dto.Course;
 import com.example.lessonservice.dto.Lesson.*;
-import com.example.lessonservice.entity.ClassRoom;
 import com.example.lessonservice.entity.LessonGroup;
 import com.example.lessonservice.service.Impl.LessonServiceImpl;
 import com.example.lessonservice.service.Impl.RestServiceTemplate;
@@ -26,8 +26,8 @@ public class LessonFacade {
 
     private final RestServiceTemplate restServiceTemplate;
 
-    public ResponseEntity<?> saveFromFile(MultipartFile multipartFile) throws IOException {
-        Map<LessonGroup, String> map = lessonService.saveLessonFromFile(multipartFile);
+    public ResponseEntity<?> saveFromFile(MultipartFile multipartFile, Long universityId) throws IOException {
+        Map<LessonGroup, String> map = lessonService.saveLessonFromFile(multipartFile, universityId);
         map.entrySet().stream().parallel().forEach(n -> {
             LessonGroup lessonGroup = n.getKey();
             lessonGroup.setGroupId(restServiceTemplate.getGroupIdByName(n.getValue().trim().toUpperCase()).getId());
@@ -79,7 +79,7 @@ public class LessonFacade {
             getUpdateLessonDto.setCourse(n.getCourseId().equals(course.getId())?course: restServiceTemplate.getCourse(n.getCourseId()));
             getUpdateLessonDto.setType(n.getType());
             getUpdateLessonDto.setTeacher(restServiceTemplate.getTeacher(n.getTeacherId()));
-            getUpdateLessonDto.setClassRoom(n.getClassRoom());
+            getUpdateLessonDto.setClassRoom(restServiceTemplate.getClassRoomById(n.getClassRoomId()));
             getUpdateLessonDto.setFromTime(n.getFromTime());
             getUpdateLessonDto.setToTime(n.getToTime());
             getUpdateLessonDto.setNumber(n.getNumber());
@@ -115,7 +115,7 @@ public class LessonFacade {
             Map<LocalTime, ClassRoom> map = new HashMap<>();
             lessonDtos.forEach(n -> {
                 if (!map.containsKey(n.getFromTime())) {
-                    map.put(n.getFromTime(), n.getClassRoom());
+                    map.put(n.getFromTime(), restServiceTemplate.getClassRoomById(n.getClassRoomId()));
                 }
             });
             return ResponseEntity.ok(map);
@@ -127,7 +127,7 @@ public class LessonFacade {
         lessonDtos.forEach(n -> {
                     ListOutputLessonDto lessonDto = map.getOrDefault(n.getDay(), new ListOutputLessonDto());
 
-                    OutputLessonDto outputLessonDto = new OutputLessonDto(n, restServiceTemplate.getCourse(n.getCourseId()), restServiceTemplate.getTeacher(n.getTeacherId()));
+                    OutputLessonDto outputLessonDto = new OutputLessonDto(n, restServiceTemplate.getCourse(n.getCourseId()), restServiceTemplate.getTeacher(n.getTeacherId()), restServiceTemplate.getClassRoomById(n.getClassRoomId()));
 
                     Map<OutputLessonDto,OutputLessonDto> thisLessonDay = lessonDto.getOutputLessonDtos();
 

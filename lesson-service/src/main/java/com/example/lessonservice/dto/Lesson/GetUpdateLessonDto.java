@@ -1,8 +1,8 @@
 package com.example.lessonservice.dto.Lesson;
 
+import com.example.lessonservice.dto.ClassRoom;
 import com.example.lessonservice.dto.Course;
 import com.example.lessonservice.dto.Teacher;
-import com.example.lessonservice.entity.ClassRoom;
 import com.example.lessonservice.entity.TypeOfLesson;
 import lombok.AllArgsConstructor;
 import lombok.Data;
