@@ -23,12 +23,14 @@ public class LessonController {
 
     @PostMapping("/lesson/file")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveFromFile(@RequestParam MultipartFile multipartFile, @RequestParam Long id) throws IOException {
+    public ResponseEntity<?> saveFromFile(@RequestParam MultipartFile multipartFile,
+                                          @RequestParam Long id,
+                                          @RequestParam Long countGroup) throws IOException {
         if(!Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xlsx")
                 && !Objects.requireNonNull(multipartFile.getResource().getFilename()).split("\\.")[1].equals("xls")){
             throw new RuntimeException("Не тот тип файла");
         }
-        return lessonSaveFacade.saveFromFile(multipartFile, id);
+        return lessonSaveFacade.saveFromFile(multipartFile, id, countGroup);
     }
 
     @PostMapping("/lessons")

@@ -16,6 +16,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+//TODO: URL
 public class RestServiceTemplate {
 
     private final ObjectProvider<RestTemplate> restTemplateObjectProvider;

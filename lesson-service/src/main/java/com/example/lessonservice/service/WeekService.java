@@ -11,7 +11,7 @@ public interface WeekService {
 
     WeekDto findWeekById(Long id);
 
-    Long findWeekByDay(LocalDateTime day);
+    WeekDto findWeekByDay(LocalDateTime day);
 
     WeekDto updateWeek(WeekDto weekDto);
 

@@ -1,4 +1,4 @@
-package com.example.lessonservice.SaveFromFile;
+package com.example.lessonservice.file;
 
 public enum Odds {
     EVEN(1), ODD(2), NONE(0);

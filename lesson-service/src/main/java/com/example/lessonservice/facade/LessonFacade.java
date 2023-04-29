@@ -26,8 +26,8 @@ public class LessonFacade {
 
     private final RestServiceTemplate restServiceTemplate;
 
-    public ResponseEntity<?> saveFromFile(MultipartFile multipartFile, Long universityId) throws IOException {
-        Map<LessonGroup, String> map = lessonService.saveLessonFromFile(multipartFile, universityId);
+    public ResponseEntity<?> saveFromFile(MultipartFile multipartFile, Long universityId, Long countGroup) throws IOException {
+        Map<LessonGroup, String> map = lessonService.saveLessonFromFile(multipartFile, universityId, countGroup);
         map.entrySet().stream().parallel().forEach(n -> {
             LessonGroup lessonGroup = n.getKey();
             lessonGroup.setGroupId(restServiceTemplate.getGroupIdByName(n.getValue().trim().toUpperCase()).getId());

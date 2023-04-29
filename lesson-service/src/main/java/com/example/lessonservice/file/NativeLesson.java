@@ -1,4 +1,4 @@
-package com.example.lessonservice.SaveFromFile;
+package com.example.lessonservice.file;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

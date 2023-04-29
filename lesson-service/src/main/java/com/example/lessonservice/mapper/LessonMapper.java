@@ -1,9 +1,8 @@
-package com.example.lessonservice.Mapper;
+package com.example.lessonservice.mapper;
 
 
 import com.example.lessonservice.dto.Lesson.LessonCreateDto;
 import com.example.lessonservice.dto.Lesson.LessonDto;
-import com.example.lessonservice.entity.ClassRoom;
 import com.example.lessonservice.entity.Lesson;
 import org.mapstruct.Mapper;
 

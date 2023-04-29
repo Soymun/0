@@ -7,6 +7,8 @@ import java.time.LocalDate;
 @Data
 public class WeekCreateDto {
 
+    private Long numberWeek;
+
     private LocalDate fromWeek;
 
     private LocalDate toWeek;

@@ -3,6 +3,7 @@ package com.example.lessonservice.service.Impl;
 import com.example.lessonservice.entity.Lesson;
 import com.example.lessonservice.entity.TypeOfLesson;
 import com.example.lessonservice.entity.Week;
+import com.example.lessonservice.exception.NotFoundException;
 import com.example.lessonservice.repositories.TypeRepository;
 import com.example.lessonservice.repositories.WeekRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +25,13 @@ public class LessonFindService {
     @Cacheable(value = "week", key = "#number")
     public Week getWeekByNumber(Long number) {
         return weekRepository.findById(number).orElseThrow(() -> {
-            throw new RuntimeException(String.valueOf(number));
+            throw new NotFoundException(String.valueOf(number));
         });
     }
 
     @Cacheable(value = "typeOfLesson", key = "#name")
     public TypeOfLesson getTypeOfLessonByName(String name) {
-        return typeRepository.getTypeByType(name).orElseThrow(() -> {throw new RuntimeException(name);});
+        return typeRepository.getTypeByType(name).orElseThrow(() -> {throw new NotFoundException(name);});
     }
 
     public void setDayInWeek(String day, Week week, Lesson lesson){

@@ -24,7 +24,7 @@ public interface LessonService {
 
     List<LessonDto> getLesson(Long groupId, LocalDate day, LocalDate day2);
 
-    Map<LessonGroup, String>  saveLessonFromFile(MultipartFile file, Long universityId) throws IOException, InterruptedException, ExecutionException;
+    Map<LessonGroup, String>  saveLessonFromFile(MultipartFile file, Long universityId, Long countGroup) throws IOException, InterruptedException, ExecutionException;
 
     List<LessonDto> getUpdateLesson(Long groupId, Long coursesId, Long typeId);
 

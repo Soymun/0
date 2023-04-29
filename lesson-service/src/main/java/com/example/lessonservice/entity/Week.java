@@ -20,6 +20,9 @@ public class Week {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "number_week")
+    private Long numberWeek;
+
     private LocalDate fromWeek;
 
     private LocalDate toWeek;

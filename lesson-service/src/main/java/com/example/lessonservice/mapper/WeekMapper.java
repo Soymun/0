@@ -1,4 +1,4 @@
-package com.example.lessonservice.Mapper;
+package com.example.lessonservice.mapper;
 
 
 import com.example.lessonservice.dto.Week.WeekCreateDto;

@@ -1,4 +1,4 @@
-package com.example.lessonservice.SaveFromFile;
+package com.example.lessonservice.file;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -23,7 +23,7 @@ public class LessonServiceSave {
     private final List<String> weekend = List.of("ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА");
 
     private List<NativeLesson> list = new ArrayList<>();
-    public List<NativeLesson> getNativeLesson(InputStream file, int countGroups) {
+    public List<NativeLesson> getNativeLesson(InputStream file, long countGroups) {
         list = new ArrayList<>();
         try (file) {
             OPCPackage pkg = OPCPackage.open(file);
@@ -38,7 +38,7 @@ public class LessonServiceSave {
         return list;
     }
 
-    private void getLesson(Iterator<Row> iterator, int countGroups) throws InterruptedException {
+    private void getLesson(Iterator<Row> iterator, long countGroups) throws InterruptedException {
         String day = "";
         long numberOfLesson = 0;
         long contRow = 0;
@@ -79,7 +79,7 @@ public class LessonServiceSave {
         }
     }
 
-    private List<String> getGroup(Iterator<Row> iterator, int countGroups) {
+    private List<String> getGroup(Iterator<Row> iterator, long countGroups) {
         List<String> list = new ArrayList<>();
         if (iterator.hasNext()) {
             Iterator<Cell> cellIterator = iterator.next().cellIterator();
@@ -100,7 +100,7 @@ public class LessonServiceSave {
         return List.of();
     }
 
-    private void distribution(NativeLesson nativeLessons) throws InterruptedException {
+    private void distribution(NativeLesson nativeLessons)  {
         if (nativeLessons.getLesson().startsWith("ч/н")) {
             convert(nativeLessons, Odds.EVEN);
         } else if (nativeLessons.getLesson().startsWith("н/н")) {
@@ -110,7 +110,7 @@ public class LessonServiceSave {
         }
     }
 
-    private void convert(NativeLesson nativeLesson, Odds odds) throws InterruptedException {
+    private void convert(NativeLesson nativeLesson, Odds odds)  {
         String[] regex = null;
         switch (odds) {
             case NONE -> regex = regex(nativeLesson.getLesson());
@@ -119,7 +119,7 @@ public class LessonServiceSave {
         convertWeek(nativeLesson, regex, odds);
     }
 
-    private void convertWeek(NativeLesson nativeLesson, String[] regex, Odds odds) throws InterruptedException {
+    private void convertWeek(NativeLesson nativeLesson, String[] regex, Odds odds) {
         String[] weeks = regex[0].split(",");
         for (String week : weeks) {
             if (!week.contains("-")) {
@@ -144,7 +144,7 @@ public class LessonServiceSave {
         }
     }
 
-    private void addLessonByWeek(NativeLesson nativeLesson, String[] regex, Odds odds, int week) throws InterruptedException {
+    private void addLessonByWeek(NativeLesson nativeLesson, String[] regex, Odds odds, int week) {
         switch (odds) {
             case ODD -> {
                 if (week % 2 == 1) {

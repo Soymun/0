@@ -1,9 +1,12 @@
 package com.example.lessonservice.service.Impl;
 
 
-import com.example.lessonservice.Mapper.LessonMapper;
-import com.example.lessonservice.SaveFromFile.LessonServiceSave;
-import com.example.lessonservice.SaveFromFile.NativeLesson;
+import com.example.lessonservice.entity.LessonGroup_;
+import com.example.lessonservice.entity.Lesson_;
+import com.example.lessonservice.exception.NotFoundException;
+import com.example.lessonservice.mapper.LessonMapper;
+import com.example.lessonservice.file.LessonServiceSave;
+import com.example.lessonservice.file.NativeLesson;
 import com.example.lessonservice.dto.Course;
 import com.example.lessonservice.dto.Lesson.LessonCreateDto;
 import com.example.lessonservice.dto.Lesson.LessonDto;
@@ -28,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -50,7 +55,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public Long saveLesson(LessonCreateDto lessonDto, Long weekId, String day) {
-        log.info("Сохранение урока");
+        log.info("Сохранение урока {} на неделю{}", lessonDto.getCourseId(), weekId);
         Lesson lesson = lessonMapper.lessonCreateDtoToLesson(lessonDto);
         Week week = lessonFindService.getWeekByNumber(weekId);
         lessonFindService.setTimeLesson(lesson.getNumber(), lesson);
@@ -61,35 +66,19 @@ public class LessonServiceImpl implements LessonService {
     @Override
     public void updateLesson(LessonToUpdateDto lessonToUpdateDto) {
         lessonToUpdateDto.getIds().stream().parallel().forEach(
-                n -> {
-                    log.info("Изменение урока с id {}", n);
-                    Lesson lesson = lessonRepository.getLessonById(n);
-                    if(lesson != null) {
-                        if (lessonToUpdateDto.getCourseId() != null) {
-                            lesson.setCoursesId(lessonToUpdateDto.getCourseId());
-                        }
-                        if (lessonToUpdateDto.getTeacherId() != null) {
-                            lesson.setTeacherId(lessonToUpdateDto.getTeacherId());
-                        }
-                        if (lessonToUpdateDto.getClassRoomId() != null) {
-                            lesson.setClassRoomId(lessonToUpdateDto.getClassRoomId());
-                        }
-                        if (lessonToUpdateDto.getDayOfWeek() != null && !lessonToUpdateDto.getDayOfWeek().getDayOfWeek().equals(lesson.getDay().getDayOfWeek())) {
-                            int range = lessonToUpdateDto.getDayOfWeek().getDayOfWeek().compareTo(lesson.getDay().getDayOfWeek());
-                            lesson.setDay(lessonToUpdateDto.getDayOfWeek().plusDays(range));
-                        }
-                        if (lessonToUpdateDto.getFromTime() != null) {
-                            lesson.setFromTime(lesson.getFromTime().withHour(lessonToUpdateDto.getFromTime().getHour()).withMinute(lessonToUpdateDto.getFromTime().getMinute()));
-                        }
-                        if (lessonToUpdateDto.getToTime() != null) {
-                            lesson.setToTime(lesson.getToTime().withHour(lessonToUpdateDto.getToTime().getHour()).withMinute(lessonToUpdateDto.getToTime().getMinute()));
-
-                        }
-                        if (lessonToUpdateDto.getTypeId() != null) {
-                            lesson.setTeacherId(lessonToUpdateDto.getTypeId());
-                        }
-                        lessonRepository.save(lesson);
-                    }
+                id -> {
+                    log.info("Изменение урока с id {}", id);
+                    Lesson lesson = lessonRepository.findById(id).orElseThrow(
+                            () -> new NotFoundException("Урок с id " + id + " не найден.")
+                    );
+                    ofNullable(lessonToUpdateDto.getCourseId()).ifPresent(lesson::setCoursesId);
+                    ofNullable(lessonToUpdateDto.getTeacherId()).ifPresent(lesson::setTeacherId);
+                    ofNullable(lessonToUpdateDto.getClassRoomId()).ifPresent(lesson::setClassRoomId);
+                    ofNullable(lessonToUpdateDto.getDayOfWeek()).ifPresent(lesson::setDay);
+                    ofNullable(lessonToUpdateDto.getFromTime()).ifPresent(lesson::setFromTime);
+                    ofNullable(lessonToUpdateDto.getToTime()).ifPresent(lesson::setToTime);
+                    ofNullable(lessonToUpdateDto.getTypeId()).ifPresent(lesson::setTypeLessonId);
+                    lessonRepository.save(lesson);
                 }
         );
     }
@@ -106,6 +95,7 @@ public class LessonServiceImpl implements LessonService {
         Subquery<TypeOfLesson> subqueryType = cq.subquery(TypeOfLesson.class);
         Root<TypeOfLesson> typeOfLessonRoot = subqueryType.from(TypeOfLesson.class);
         subqueryType.select(typeOfLessonRoot);
+
         cq.where(cb.and(cb.equal(join.get(Lesson_.TEACHER_ID), id), cb.between(join.get(Lesson_.DAY), day, day2)));
         cq.orderBy(cb.asc(join.get(Lesson_.DAY)),cb.asc(join.get(Lesson_.COURSES_ID)), cb.asc(join.get(Lesson_.NUMBER)));
         cq.multiselect(
@@ -124,7 +114,7 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public List<LessonDto> getLesson(Long groupId, LocalDate day , LocalDate day2) {
+    public List<LessonDto> getLesson(Long groupId, LocalDate day, LocalDate day2) {
         log.info("Поиск уроков для группы с id {}", groupId);
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<LessonDto> cq = cb.createQuery(LessonDto.class);
@@ -153,16 +143,23 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public Map<LessonGroup, String> saveLessonFromFile(MultipartFile file, Long universityId) throws IOException {
+    public Map<LessonGroup, String> saveLessonFromFile(MultipartFile file, Long universityId, Long countGroup) throws IOException {
         log.info("Сохранение уроков из файла");
-        List<NativeLesson> nativeLessons = lessonServiceSave.getNativeLesson(file.getInputStream(), 4);
+        List<NativeLesson> nativeLessons = lessonServiceSave.getNativeLesson(file.getInputStream(), countGroup);
         Map<LessonGroup, String> lessonGroupStringMap = new HashMap<>();
         nativeLessons.stream().parallel().forEach(les -> {
             Week week = lessonFindService.getWeekByNumber(les.getWeak());
             if (week != null) {
                 Lesson lesson = new Lesson();
                 try {
-                    fillLesson(lesson, les.getNumber(), les.getTeacher(), les.getGroup(), les.getLesson(), les.getClassroom(), les.getType(), universityId);
+                    Course course = restServiceTemplate.getCourse(les.getGroup(), les.getLesson());
+                    lesson.setCoursesId(course.getId());
+                    lesson.setNumber(les.getNumber());
+                    lesson.setTeacherId(restServiceTemplate.getTeacher(les.getTeacher()
+                            .replace("-- продолжение --", "")
+                            .trim()).getId());
+                    lesson.setClassRoomId(restServiceTemplate.getClassRoomByUniversityIdAndName(universityId, les.getClassroom().trim()).getId());
+                    lesson.setTypeLessonId(lessonFindService.getTypeOfLessonByName(les.getType().trim()).getId());
                     lessonFindService.setDayInWeek(les.getDay(), week, lesson);
                     lessonFindService.setTimeLesson(les.getNumber(), lesson);
                     Lesson savedLesson = lessonRepository.save(lesson);
@@ -170,7 +167,7 @@ public class LessonServiceImpl implements LessonService {
                     lessonGroup.setLessonId(savedLesson.getId());
                     lessonGroupStringMap.put(lessonGroup, les.getGroup().trim());
                 } catch (Exception ex) {
-                    log.info(ex.getMessage());
+                    log.debug(ex.getMessage());
                 }
             }
         });
@@ -228,27 +225,5 @@ public class LessonServiceImpl implements LessonService {
     public void saveLessonGroup(LessonGroup lessonGroup) {
         log.info("Сохранение уроков для групп");
         lessonGroupRepository.save(lessonGroup);
-    }
-
-    private void fillLesson(Lesson lesson,
-                            Long number,
-                            String teacherName,
-                            String group,
-                            String nameLesson,
-                            String classRoom,
-                            String type,
-                            Long universityId) {
-        Course course = restServiceTemplate.getCourse(group, nameLesson);
-        lesson.setCoursesId(course.getId());
-
-        lesson.setNumber(number);
-
-        lesson.setTeacherId(restServiceTemplate.getTeacher(teacherName
-                .replace("-- продолжение --", "")
-                .trim()).getId());
-
-        lesson.setClassRoomId(restServiceTemplate.getClassRoomByUniversityIdAndName(universityId, classRoom.trim()).getId());
-
-        lesson.setTypeLessonId(lessonFindService.getTypeOfLessonByName(type.trim()).getId());
     }
 }
