@@ -21,7 +21,7 @@ public class Bid {
     private Long id;
 
     @Column(name = "student_id")
-    private Long studentId;
+    private Long student;
 
     @Column(name = "type_of_bid_id")
     private Long typeOfBidId;

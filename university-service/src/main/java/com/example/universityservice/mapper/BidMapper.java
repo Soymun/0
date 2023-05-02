@@ -2,6 +2,7 @@ package com.example.universityservice.mapper;
 
 
 
+import com.example.universityservice.dto.Student;
 import com.example.universityservice.dto.bid.BidCreateDto;
 import com.example.universityservice.dto.bid.BidDto;
 import com.example.universityservice.dto.type.TypeOfBidCreateDto;
@@ -20,4 +21,10 @@ public interface BidMapper {
     TypeOfBid typeOfBidCreateDtoToTypeOfBid(TypeOfBidCreateDto type);
 
     TypeOfBidDto typeOfBidToTypeOfBidDto(TypeOfBid type);
+
+    default Student map(Long value){
+        Student student = new Student();
+        student.setId(value);
+        return student;
+    }
 }

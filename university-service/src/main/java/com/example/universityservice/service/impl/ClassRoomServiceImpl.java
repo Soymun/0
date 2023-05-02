@@ -21,9 +21,9 @@ import static java.util.Optional.ofNullable;
 @RequiredArgsConstructor
 public class ClassRoomServiceImpl implements ClassRoomService {
 
-    private ClassRoomRepository classRoomRepository;
+    private final ClassRoomRepository classRoomRepository;
 
-    private ClassRoomMapper classRoomMapper;
+    private final ClassRoomMapper classRoomMapper;
 
     @Override
     public ClassRoomDto getClassRoomById(Long id) {

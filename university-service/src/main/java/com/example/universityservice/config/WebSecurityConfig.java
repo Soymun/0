@@ -1,4 +1,4 @@
-package com.example.lessonservice.config;
+package com.example.universityservice.config;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;

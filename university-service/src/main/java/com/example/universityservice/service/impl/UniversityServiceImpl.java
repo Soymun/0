@@ -20,9 +20,9 @@ import static java.util.Optional.ofNullable;
 @RequiredArgsConstructor
 public class UniversityServiceImpl  implements UniversityService {
 
-    private UniversityRepository universityRepository;
+    private final UniversityRepository universityRepository;
 
-    private UniversityMapper universityMapper;
+    private final UniversityMapper universityMapper;
 
     @Override
     public UniversityDto getUniversityById(Long id) {
