@@ -15,6 +15,8 @@ public class TeacherCreateDto {
 
     private Long universityId;
 
+    private String email;
+
     private String patronymicTeacher;
 
     private UUID userId;

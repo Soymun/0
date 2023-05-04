@@ -30,6 +30,8 @@ public class Teacher {
 
     private String patronymicTeacher;
 
+    private String email;
+
     @Column(name = "user_id")
     private UUID userId;
 

@@ -22,6 +22,8 @@ public class StudentCreateDto {
 
     private UUID userId;
 
+    private String email;
+
     @JsonFormat(pattern = "yyyy:mm:dd")
     private LocalDate birthday;
 

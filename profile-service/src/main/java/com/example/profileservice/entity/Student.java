@@ -32,6 +32,8 @@ public class Student {
 
     private UUID userId;
 
+    private String email;
+
     private LocalDate birthday;
 
     private Long groupId;

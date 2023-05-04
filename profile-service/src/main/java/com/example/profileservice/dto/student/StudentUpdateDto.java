@@ -21,6 +21,8 @@ public class StudentUpdateDto {
 
     private String patronymic;
 
+    private String email;
+
     @JsonFormat(pattern = "yyyy:mm:dd")
     private LocalDate birthday;
 

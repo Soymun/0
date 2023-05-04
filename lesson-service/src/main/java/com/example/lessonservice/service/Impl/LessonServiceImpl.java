@@ -157,7 +157,7 @@ public class LessonServiceImpl implements LessonService {
                     lesson.setNumber(les.getNumber());
                     lesson.setTeacherId(restServiceTemplate.getTeacher(les.getTeacher()
                             .replace("-- продолжение --", "")
-                            .trim()).getId());
+                            .trim(), universityId).getId());
                     lesson.setClassRoomId(restServiceTemplate.getClassRoomByUniversityIdAndName(universityId, les.getClassroom().trim()).getId());
                     lesson.setTypeLessonId(lessonFindService.getTypeOfLessonByName(les.getType().trim()).getId());
                     lessonFindService.setDayInWeek(les.getDay(), week, lesson);

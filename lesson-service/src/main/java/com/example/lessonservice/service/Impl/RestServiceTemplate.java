@@ -23,9 +23,9 @@ public class RestServiceTemplate {
 
 
     @Cacheable(value = "teacher", key = "#nameTeacher")
-    public Teacher getTeacher(String nameTeacher){
+    public Teacher getTeacher(String nameTeacher, Long universityId){
         RestTemplate restTemplate = restTemplateObjectProvider.getObject();
-        return restTemplate.getForObject("http://localhost:8072/teacher/v1/teacher/{teacherName}", Teacher.class, nameTeacher);
+        return restTemplate.getForObject("http://localhost:8072/profile/v1/teacher/{universityId}/{teacherName}", Teacher.class,universityId, nameTeacher);
     }
 
     @Cacheable(value = "teacher", key = "{#id, #name}")
@@ -43,7 +43,7 @@ public class RestServiceTemplate {
     @Cacheable(value = "teacher", key = "#id")
     public Teacher getTeacher(Long id){
         RestTemplate restTemplate = restTemplateObjectProvider.getObject();
-        return restTemplate.getForObject("http://localhost:8072/teacher/v1/teacher/{id}", Teacher.class, id);
+        return restTemplate.getForObject("http://localhost:8072/profile/v1/teacher/{id}", Teacher.class, id);
     }
 
     @Cacheable(value = "group", key = "{#group, #nameLesson}")
@@ -61,12 +61,12 @@ public class RestServiceTemplate {
     @Cacheable(value = "group", key = "#name")
     public Group getGroupIdByName(String name){
         RestTemplate restTemplate = restTemplateObjectProvider.getObject();
-        return restTemplate.getForObject("http://localhost:8072/group/v1/group/{name}", Group.class, name);
+        return restTemplate.getForObject("http://localhost:8072/university/v1/group/{name}", Group.class, name);
     }
 
     @Cacheable(value = "group", key = "#id")
     public List<Group> getGroupById(Long id){
         RestTemplate restTemplate = restTemplateObjectProvider.getObject();
-        return Arrays.stream(Objects.requireNonNull(restTemplate.getForObject("http://localhost:8072/group/v1/group/{id}", Group[].class, id))).toList();
+        return Arrays.stream(Objects.requireNonNull(restTemplate.getForObject("http://localhost:8072/university/v1/group/{id}", Group[].class, id))).toList();
     }
 }

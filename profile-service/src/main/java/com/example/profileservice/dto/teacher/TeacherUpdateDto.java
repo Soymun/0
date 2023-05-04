@@ -21,4 +21,6 @@ public class TeacherUpdateDto {
     private String patronymicTeacher;
     private Long universityId;
 
+    private String email;
+
 }

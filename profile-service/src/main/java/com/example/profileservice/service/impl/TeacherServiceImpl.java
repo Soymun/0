@@ -55,6 +55,7 @@ public class TeacherServiceImpl implements TeacherService {
         ofNullable(teacherDto.getPatronymicTeacher()).ifPresent(teacher::setPatronymicTeacher);
         ofNullable(teacherDto.getName()).ifPresent(teacher::setName);
         ofNullable(teacherDto.getUniversityId()).ifPresent(teacher::setUniversityId);
+        ofNullable(teacherDto.getEmail()).ifPresent(teacher::setEmail);
         return teacherMapper.teacherToTeacherDto(teacherRepository.save(teacher));
     }
 

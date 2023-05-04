@@ -53,6 +53,7 @@ public class StudentServiceImpl implements StudentService {
         ofNullable(studentUpdateDto.getGroupId()).ifPresent(student::setGroupId);
         ofNullable(studentUpdateDto.getSurname()).ifPresent(student::setSurname);
         ofNullable(studentUpdateDto.getPatronymic()).ifPresent(student::setPatronymic);
+        ofNullable(studentUpdateDto.getEmail()).ifPresent(student::setEmail);
         return studentMapper.studentToStudentDto(studentRepository.save(student));
     }
 
