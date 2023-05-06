@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
+//y
 @Entity
 @Getter
 @Setter

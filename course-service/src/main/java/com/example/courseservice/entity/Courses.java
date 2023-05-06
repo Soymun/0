@@ -1,12 +1,12 @@
-package com.example.demo.Entity;
+package com.example.courseservice.entity;
 
 
-import lombok.*;
-import org.hibernate.Hibernate;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
-import java.util.Objects;
-//y
 @Entity
 @Getter
 @Setter
@@ -24,9 +24,8 @@ public class Courses {
     @Column(name = "teacher_id")
     private Long teacherId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id", insertable = false, updatable = false)
-    private Teacher teacher;
+    @Column(name = "university_Id")
+    private Long universityId;
 
     public Courses(String name) {
         this.name = name;

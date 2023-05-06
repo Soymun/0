@@ -1,37 +1,30 @@
-package com.example.demo.Entity;
+package com.example.courseservice.entity;
 
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-//y
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Marks {
+public class GroupCourse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private User user;
-
-    @Column(name = "courses_id")
-    private Long courses_id;
+    @Column(name = "group_id")
+    private Long groupId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "courses_id", insertable = false, updatable = false)
     private Courses courses;
 
-    private Long mark;
+    @Column(name = "courses_id")
+    private Long courseId;
 }

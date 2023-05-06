@@ -4,7 +4,7 @@ package com.example.demo.Entity;
 import javax.persistence.*;
 
 import lombok.*;
-
+//y
 @Entity
 @Getter
 @Setter
