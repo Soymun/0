@@ -1,6 +1,7 @@
 package com.example.lessonservice.service.Impl;
 
 
+import com.example.lessonservice.dto.Group;
 import com.example.lessonservice.entity.LessonGroup_;
 import com.example.lessonservice.entity.Lesson_;
 import com.example.lessonservice.exception.NotFoundException;
@@ -152,7 +153,8 @@ public class LessonServiceImpl implements LessonService {
             if (week != null) {
                 Lesson lesson = new Lesson();
                 try {
-                    Course course = restServiceTemplate.getCourse(les.getGroup(), les.getLesson());
+                    Group group = restServiceTemplate.getGroupIdByName(les.getGroup().trim());
+                    Course course = restServiceTemplate.getCourse(group.getId(), les.getLesson());
                     lesson.setCoursesId(course.getId());
                     lesson.setNumber(les.getNumber());
                     lesson.setTeacherId(restServiceTemplate.getTeacher(les.getTeacher()

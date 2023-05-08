@@ -46,10 +46,10 @@ public class RestServiceTemplate {
         return restTemplate.getForObject("http://localhost:8072/profile/v1/teacher/{id}", Teacher.class, id);
     }
 
-    @Cacheable(value = "group", key = "{#group, #nameLesson}")
-    public Course getCourse(String group, String nameLesson){
+    @Cacheable(value = "group", key = "{#groupId, #nameLesson}")
+    public Course getCourse(Long groupId, String nameLesson){
         RestTemplate restTemplate = restTemplateObjectProvider.getObject();
-        return restTemplate.getForObject("http://localhost:8072/course/v1/course/{groupId}/{nameLesson}", Course.class, group, nameLesson);
+        return restTemplate.getForObject("http://localhost:8072/course/v1/course/{groupId}/{nameLesson}", Course.class, groupId, nameLesson);
     }
 
     @Cacheable(value = "group", key = "#id")
